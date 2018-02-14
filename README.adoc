@@ -1,0 +1,17 @@
+= Angular Workshop
+These are my notes and code snippets from the Udemy Workshop https://www.udemy.com/the-complete-guide-to-angular-2[The complete guide to Angular].
+
+== Introduction
+* Angular = framework for reactive single-page-applications
+** single-page = one HTML-file that gets changed by JS
+** reactive = not necessarily a server-call (and if, can be done in the background)
+* version madness
+** "Angular.js" = Angular 1 = first version of framework
+** "Angular 2" = first major rewrite, also known as simply "Angular"
+** "Angular 3" skipped for some reason
+** "Angular 4" and "Angular 5" = latest versions
+** however, only two major and potentially incompatible versions: Angular.js and "the rest" a.k.a. "Angular" because only Angular 2 had major changes
+
+== Angular CLI
+* builds new projects that can than be used
+* less setup, less writing boiler plate, more coding business logic
