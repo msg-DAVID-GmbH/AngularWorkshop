@@ -47,6 +47,7 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 ** folder e2e contains end-to-end testing
 ** folder src/app should be the only location changes should be applied to
 ** src/index.html = HTML file that is changed by the Java Script of the framework
+** folder node_modules is https://stackoverflow.com/questions/34526844/what-is-node-modules-directory-in-angularjs[just for build tools] and hence excluded in the .gitignore
 ** README.md contains the most important commands
 ** other single files = configuration; no need to touch ... maybe later
 ** ending "ts" is  for "type script" because this superset of Java Script, which is a new statically typed programming language on top of Java Script, is used in Angular
