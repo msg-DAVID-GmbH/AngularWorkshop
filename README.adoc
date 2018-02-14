@@ -1,4 +1,9 @@
 = Angular Workshop
+:toc:
+:toclevels: 1
+:sectnums:
+:imagesdir: images
+
 These are my notes and code snippets from the Udemy Workshop https://www.udemy.com/the-complete-guide-to-angular-2[The complete guide to Angular].
 
 == Introduction
@@ -44,6 +49,7 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 ** src/index.html = HTML file that is changed by the Java Script of the framework
 ** README.md contains the most important commands
 ** other single files = configuration; no need to touch ... maybe later
+** ending "ts" is  for "type script" because this superset of Java Script, which is a new statically typed programming language on top of Java Script, is used in Angular
 
 === Run project
 * navigate in created folder and run (in Windows console)
@@ -56,6 +62,14 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 == Tooling
 * https://www.jetbrains.com/webstorm/[WebStorm] is a lightweight IntelliJ IDEA and is suited for web development right away. However, IntelliJ IDEA https://stackoverflow.com/questions/13827214/can-intellij-idea-encapsulate-all-of-the-functionality-of-webstorm-and-phpstorm/13829907#13829907[can be upgraded via plugins to offer nearly the same functionality.]
 * Creating new Angular and/or Angular CLI project possible via WebStorm. Maybe the better way to create new projects in the future.
+* WebStorm supports Angular:
 
-= Open Questions
+image::angularSupportInWebStorm.png[]
+
+
+= Open Questions and Tasks
+* Switch from WebStorm to IntelliJ IDEA
+** find out if IntelliJ also supports Angular like WebStorm / what to do to make it so
+** find out if occurrences / usages of variables defined in app.component.ts are are searchable via Alt + F7. This is possible in WebStorm and absolutely awesome.
 * can the "ng serve" command be executed from within WebStorm, so I don't have to leave the IDE?
+* move the example project to this repository
