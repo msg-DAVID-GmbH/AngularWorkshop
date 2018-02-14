@@ -133,6 +133,21 @@ instead of
 *** defines the name (="selector") of the component ("app-root") with which it can be used in other HTML-files
 ** *app.module.ts*
 *** ?
+* naming convention in Angular: [name of component].component.[file type], for example "server.component.ts" is the type script file for the server component
+* another aspect in Angular: "*Decorator*" = feature to enhance components with functionality, for example "@Component". Decorator needs information to know what to do with the annotated class, so a JSON object is provided:
+
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
+  })
+
+=== Creating minimal component
+. create new directory in src/app, for example "server"
+. create server.component.ts with a (unique!) selector and a reference to a template
+. create template server.component.html
+. register new component in app.module.ts in the declarations-array (there are other ways to make the new component known to the app, but that's the right way)
+. use new component in app.component.html - NOT in the index.html because of best practice
 
 = Open Questions and Tasks
 * can the "ng serve" command be executed from within WebStorm, so I don't have to leave the IDE?
