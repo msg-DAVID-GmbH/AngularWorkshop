@@ -54,9 +54,8 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 * should be kept running all the time because changes in files are automatically saved, compiled and the app refreshed in the browser (without the need to hit F5!)
 
 == Tooling
-* probably best IDE: https://www.jetbrains.com/webstorm/[WebStorm] (because IntelliJ is the best Java IDE, so WebStorm which is also from JetBrains should be the best IDE for Java Script. I guess.
-* 30-day-trial available
-* Creating new Angular and/or Angular CLI project possible via the IDE. Maybe the better way to create new projects in the future.
+* https://www.jetbrains.com/webstorm/[WebStorm] is a lightweight IntelliJ IDEA and is suited for web development right away. However, IntelliJ IDEA https://stackoverflow.com/questions/13827214/can-intellij-idea-encapsulate-all-of-the-functionality-of-webstorm-and-phpstorm/13829907#13829907[can be upgraded via plugins to offer nearly the same functionality.]
+* Creating new Angular and/or Angular CLI project possible via WebStorm. Maybe the better way to create new projects in the future.
 
 = Open Questions
 * can the "ng serve" command be executed from within WebStorm, so I don't have to leave the IDE?
