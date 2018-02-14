@@ -12,6 +12,36 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 ** "Angular 4" and "Angular 5" = latest versions
 ** however, only two major and potentially incompatible versions: Angular.js and "the rest" a.k.a. "Angular" because only Angular 2 had major changes
 
-== Angular CLI
+== Setup
+* following steps are for Windows machines; Linux can slightly diver
+
+=== Install NodeJS
+* https://nodejs.org/en/
+* ... because Angular CLI needs it ...
+* manages packages and loads a local development server
+
+=== Install Angular CLI
 * builds new projects that can than be used
 * less setup, less writing boiler plate, more coding business logic
+* in console:
+
+    npm install -g @angular/cli
+
+* npm = Node package manager, came with NodeJS
+* -g = global install
+* @angular/cli = package
+
+=== Create new Angular Project
+* create new folder and navigate to it in console
+* creating new project:
+
+    ng new my-first-app
+
+* my-first-app is the name of the app
+
+=== Run project
+* navigate in created folder and run
+
+    ng serve
+
+* will build all source code and run a dev server (see output for address)
