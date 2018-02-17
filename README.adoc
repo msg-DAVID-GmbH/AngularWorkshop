@@ -91,7 +91,8 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 * instead:
 ** "mvnw" to start Maven build and run application OR
 ** "yarn start" to start webpack development server for monitoring and generating beans and so on. Also notices changes in files and deploys them automatically OR
-** via IDE: Maven Projects -> Plugins -> spring-boot -> spring-boot:run. This is also what will be done after deployment, so this is most likely the best option.
+** via IDE: Maven Projects -> Plugins -> spring-boot -> spring-boot:run or simply execute run config (gets created automatically). This is also what will be done after deployment, so this is most likely the best option.
+*** *Attention*: The application tends to switch to the prod-profile after deployment! To prevent this, add the VM Option "-Dspring.profiles.active=dev" in the run config.
 
 === Deployment to Pivotal Cloud Foundry
 * for example in free version of https://run.pivotal.io[Pivotal Web Services]
