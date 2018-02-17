@@ -17,7 +17,8 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 ** "Angular 4" and "Angular 5" = latest versions
 ** however, only two major and potentially incompatible versions: Angular.js and "the rest" a.k.a. "Angular" because only Angular 2 had major changes
 
-== Setup
+== Setup Option 1: Just Angular
+* this option: only little Angular project for learning plain angular
 * following steps are for Windows machines; Linux can slightly diver
 
 === Install NodeJS
@@ -33,6 +34,7 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
     npm install -g @angular/cli
 
 * npm = Node package manager, came with NodeJS
+* package.json in NPM comparable to pom.xml in Maven
 * -g = global install
 * @angular/cli = package
 
@@ -42,6 +44,7 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 
     ng new my-first-app
 
+* "ng" stands for Angular
 * my-first-app is the name of the app
 * overview of what will be created:
 ** folder e2e contains end-to-end testing
@@ -63,6 +66,45 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 
 * will build all source code and run a dev server (see output for address)
 * should be kept running all the time because changes in files are automatically saved, compiled and the app refreshed in the browser (without the need to hit F5!)
+
+== Setup Option 2: Angular with Spring Boot Backend and Deployment in Pivotal Cloud Foundry
+* this option: complete and deployable application with Angular UI
+* http://www.jhipster.tech[JHipster] = Spring Boot + Angular Generator
+
+=== Install Yarn
+* https://yarnpkg.com/lang/en/docs/install/#windows[Yarn] = Dependency Manager
+* "yarn global add generator-jhipster" in Terminal will install Yarn
+
+=== Create Project Folder
+
+    mkdir testfolder && cd testfolder
+
+=== Generate Project
+* in Terminal:
+
+    jhipster
+
+* *Attention*: I had problems with the database dialect when choosing a different database than PostgreSQL as production and development- database. During Deployment, other databases will cause errors because of problems in the Liquibase script. *For the moment, just choose PostgreSQL as both dev and prod database*.
+
+=== Running Project locally
+* running "ng serve" (like in Setup Option 1) in this folder doesn't work :(
+* instead:
+** "mvnw" to start Maven build and run application OR
+** "yarn start" to start webpack development server for monitoring and generating beans and so on. Also notices changes in files and deploys them automatically OR
+** via IDE: Maven Projects -> Plugins -> spring-boot -> spring-boot:run. This is also what will be done after deployment, so this is most likely the best option.
+
+=== Deployment to Pivotal Cloud Foundry
+* for example in free version of https://run.pivotal.io[Pivotal Web Services]
+* in terminal; explicit command to deploy to Cloud Foundry (see http://www.jhipster.tech/cloudfoundry/[help])
+
+    jhipster cloudfoundry
+
+* this will execute "cf push", create a route to the app and bind services like the database
+* *Attention*:
+** When running the first time, this will ask to overwrite the pom.xml because during build, additional dependencies are inserted. Overwrite the file.
+** However, the new pom.xml doesn't get loaded with the first deployment. Hence, it will fail.
+** "Solution": Deploy a second time.
+** After this first run, every deployment will work fine.
 
 == Tooling
 * IntelliJ IDEA supports Angular right from the start:
