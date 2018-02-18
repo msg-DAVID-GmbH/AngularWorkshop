@@ -124,6 +124,17 @@ image::referenceSearchInIDEA.png[]
 * Angular uses TypeScript: files ending with "ts"
 * superset of Java Script, which is a new statically, strongly-typed programming language on top of Java Script
 * doesn't run in the browser, has to be compiled - that's what the CLI is for!
+* type can either be stated explicitly:
+
+    serverId:number = 10;
+
+* type can also be omitted and chosen automatically:
+
+    serverId = 10;
+
+* with Ctrl + B, variables reveal their types:
+
+image::typeCheckingWithCtrlB.png[]
 
 == Bootstrap
 * https://getbootstrap.com[Bootstrap] = toolkit for HTML, CSS and JS
