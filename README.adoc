@@ -84,8 +84,6 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 
     jhipster
 
-* *Attention*: I had problems with the database dialect when choosing a different database than PostgreSQL as production and development- database. During Deployment, other databases will cause errors because of problems in the Liquibase script. *For the moment, just choose PostgreSQL as both dev and prod database*.
-
 === Running Project locally
 * running "ng serve" (like in Setup Option 1) in this folder doesn't work :(
 * instead:
@@ -162,7 +160,7 @@ instead of
           ],
 ----
 
-== The first Component
+== Writing Components
 * components = key feature of Angular
 * reusable
 * separation of concerns because every component has its own controller and therefore business logic
@@ -189,12 +187,17 @@ instead of
     styleUrls: ['./app.component.css']
   })
 
-=== Creating minimal component
+=== Creating minimal Component
 . create new directory in src/app, for example "server"
 . create server.component.ts with a (unique!) selector and a reference to a template
 . create template server.component.html
 . register new component in app.module.ts in the declarations-array (there are other ways to make the new component known to the app, but that's the right way)
 . use new component in app.component.html - NOT in the index.html because of best practice
 
-= Open Questions and Tasks
-* can the "ng serve" command be executed from within WebStorm, so I don't have to leave the IDE?
+=== Creating a Component via CLI
+* open a *new* terminal window beside the one running _ng serve_
+* the following will create a new component named "servers"
+
+    ng generate component servers
+
+* will create a new folder in _src/app_ and add an entry in app.module.ts, registering the new component
