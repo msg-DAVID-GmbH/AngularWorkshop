@@ -67,7 +67,7 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 * will build all source code and run a dev server (see output for address)
 * should be kept running all the time because changes in files are automatically saved, compiled and the app refreshed in the browser (without the need to hit F5!)
 
-== Setup Option 2: Angular with Spring Boot Backend and Deployment in Pivotal Cloud Foundry
+== Setup Option 2: JHipster = Angular with Spring Boot Backend and Deployment in Pivotal Cloud Foundry
 * this option: complete and deployable application with Angular UI
 * http://www.jhipster.tech[JHipster] = Spring Boot + Angular Generator
 
@@ -106,6 +106,10 @@ These are my notes and code snippets from the Udemy Workshop https://www.udemy.c
 ** However, the new pom.xml doesn't get loaded with the first deployment. Hence, it will fail.
 ** "Solution": Deploy a second time.
 ** After this first run, every deployment will work fine.
+
+=== Generating Entities with JDL-Studio
+* http://www.jhipster.tech/jdl/[JDL = JHipster Domain Language]
+* https://start.jhipster.tech/jdl-studio/[JDL Studio] = Online Generator for JDL-files that can be imported into JHipster and entities are created
 
 == Tooling
 * IntelliJ IDEA supports Angular right from the start:
