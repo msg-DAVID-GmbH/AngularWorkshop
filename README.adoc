@@ -201,3 +201,13 @@ instead of
     ng generate component servers
 
 * will create a new folder in _src/app_ and add an entry in app.module.ts, registering the new component
+
+== Databinding
+* = Communication between TypeScript-Code (which is business logic) and the HTML-Template
+* Output Data from TypeScript to HTML-Template:
+** String Interpolation ( _{{data}}_ )
+** Property Binding ( _[property]="data"_ )
+* Reacto to events
+** Event Binding ( _(event)="expression"_ )
+* combination of both: Two-way-Binding ( _[(ngModel)]="data"_ )
+
