@@ -218,7 +218,7 @@ instead of
 * Output Data from TypeScript to HTML-Template:
 ** String Interpolation ( _{{data}}_ )
 ** Property Binding ( _[property]="data"_ )
-* Reacto to events
+* React to to events
 ** Event Binding ( _(event)="expression"_ )
 * combination of both: Two-way-Binding ( _[(ngModel)]="data"_ )
 
