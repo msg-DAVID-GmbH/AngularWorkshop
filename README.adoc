@@ -216,11 +216,25 @@ instead of
 == Databinding
 * = Communication between TypeScript-Code (which is business logic) and the HTML-Template
 * Output Data from TypeScript to HTML-Template:
-** String Interpolation ( _{{data}}_ )
-** Property Binding ( _[property]="data"_ )
+** String Interpolation:
+
+      {{data}}
+
+** Property Binding:
+
+     [property]="data"
+
 * React to to events
-** Event Binding ( _(event)="expression"_ )
-*** for example: <input type="text" class="form-control" (input)="onUpdateServerName($event)">
+** Event Binding:
+
+    (event)="expression"
+
+*** for example:
+
+     <input type="text" class="form-control" (input)="onUpdateServerName($event)">
+
 *** "$event" is the object automatically created with every event
-* combination of both: Two-way-Binding ( _[(ngModel)]="data"_ )
+* combination of both: Two-way-Binding:
+
+     [(ngModel)]="data"
 
