@@ -261,3 +261,11 @@ instead of
 * *attribute-directives* change elements they are placed on:
 
     <p [ngStyle]="{color: getColor()}">Server with ID .. </p>
+
+* another attribute-directive to apply CSS-classes:
+
+    <p [ngClass]="{
+      online: serverStatus === 'online',
+      offline: serverStatus === 'offline'
+      }">
+      Server with ID ...</p>
