@@ -238,3 +238,23 @@ instead of
 
      [(ngModel)]="data"
 
+== Directives
+* = instructions in the DOM
+* "Angular, please add something to the DOM"
+* => components are directives, but directives with a template (there are also directives without a template)
+* directives are inserted via attribute:
+
+    <p colorThisText>Receives a green background</p>
+
+    @Directive({
+      selector: 'colorThisText'
+    })
+    export class ColorTextDirective {
+      ...
+    }
+
+* important build-in directive:
+
+    <p *ngIf="serverCreated">Server was created, server name is {{serverName}}</p>
+
+* star before "ngIf" indicates ngIf being a structural directive = changes the DOM
