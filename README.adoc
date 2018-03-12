@@ -257,4 +257,7 @@ instead of
 
     <p *ngIf="serverCreated">Server was created, server name is {{serverName}}</p>
 
-* star before "ngIf" indicates ngIf being a structural directive = changes the DOM
+* star before "ngIf" indicates ngIf being a *structural directive* = changes the DOM
+* *attribute-directives* change elements they are placed on:
+
+    <p [ngStyle]="{color: getColor()}">Server with ID .. </p>
