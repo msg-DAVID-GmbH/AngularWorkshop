@@ -10,6 +10,7 @@ export class ServersComponent implements OnInit {
   allowNewServer = false;
   serverName = 'Test-Server';
   serverCreated = false;
+  servers = ['Testserver', 'Testserver2'];
 
   constructor() {
   }
@@ -19,5 +20,6 @@ export class ServersComponent implements OnInit {
 
   onCreateServer() {
     this.serverCreated = true;
+    this.servers.push(this.serverName);
   }
 }
