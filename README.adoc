@@ -212,6 +212,13 @@ instead of
     ng generate component servers
 
 * will create a new folder in _src/app_ and add an entry in app.module.ts, registering the new component
+* pro-tip: There's a shortcut for this:
+
+    ng g c servers
+
+* for better structure, components should be encapsulated in a folder structure which can be defined by applying a path:
+
+    ng g c management/technical/servers
 
 == Databinding
 * = Communication between TypeScript-Code (which is business logic) and the HTML-Template
