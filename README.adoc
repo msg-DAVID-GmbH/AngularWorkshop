@@ -120,6 +120,16 @@ image::referenceSearchInIDEA.png[]
 
 * also, https://www.jetbrains.com/webstorm/[WebStorm] is a lightweight IntelliJ IDEA and is suited for web development right away. However, IntelliJ IDEA https://stackoverflow.com/questions/13827214/can-intellij-idea-encapsulate-all-of-the-functionality-of-webstorm-and-phpstorm/13829907#13829907[can be upgraded via plugins to offer nearly the same functionality.]
 
+=== Emmet
+* https://emmet.io
+* = Plugin for working with HTML and CSS
+* already activated in IntelliJ IDEA
+* workflow: write abbreviation, press Tab
+* documentation for settings for https://www.jetbrains.com/help/idea/emmet-html.html[HTML-support] and https://www.jetbrains.com/help/idea/emmet-css.html[CSS-support]
+* in settings "enable abbreviation preview":
+
+image::emmetAbbreviationPreview.png[]
+
 == TypeScript
 * Angular uses TypeScript: files ending with "ts"
 * superset of Java Script, which is a new statically, strongly-typed programming language on top of Java Script
@@ -137,7 +147,12 @@ image::referenceSearchInIDEA.png[]
 image::typeCheckingWithCtrlB.png[]
 
 == Bootstrap
-* https://getbootstrap.com[Bootstrap] = toolkit for HTML, CSS and JS
+* https://getbootstrap.com[Bootstrap] = toolkit for HTML, CSS and JS that provides a lot of ready-to-user CSS and components
+* https://getbootstrap.com/docs/3.3/css/[CSS-styles] for tables, buttons, images and more
+* https://getbootstrap.com/docs/3.3/components/[Components] like button groups, navigation bars and progress bars
+* https://getbootstrap.com/docs/3.3/getting-started/#examples[basic examples as a starting point]
+
+=== Usage in this course
 * in the course, Bootstrap 3 is used. Hence use
 
 [source]
@@ -154,8 +169,8 @@ instead of
 
 * run this in IntelliJ IDEA via build-in Terminal will download Bootstrap
 * after downloading, it has to be imported:
-** open .angular-cli.json
-** add something to the array of styles:
+* open .angular-cli.json
+* add something to the array of styles:
 
 [source,json]
 ----
@@ -163,10 +178,10 @@ instead of
             "styles.css"
           ],
 ----
-** add newly downloaded Bootstrap-style from directory node_modules:
+* add newly downloaded Bootstrap-style from directory node_modules:
 ----
     "styles": [
-            "../node_modules/bootstrap/dist/css/bootstrap.css",
+            "../node_modules/bootstrap/dist/css/bootstrap.min.css",
             "styles.css"
           ],
 ----
