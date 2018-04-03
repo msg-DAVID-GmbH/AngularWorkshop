@@ -173,6 +173,18 @@ export class Ingredient {
 ----
 * properties will be automatically created and assigned with the parameters of the constructor
 
+== Debugging
+=== Developer Tools
+* main problem: TypeScript getting translated into JavaScript
+* solution: open developer tools in browser (in this example Vivaldi) (F12) -> "Sources"
+* TypeScript sources available in the left window under webpack
+* adding breakpoints like in IDE
+
+=== Augury
+* = Chrome extension specifically for debugging Angular applications
+* https://augury.angular.io
+* new tab in developer tools
+
 == Bootstrap
 * https://getbootstrap.com[Bootstrap] = toolkit for HTML, CSS and JS that provides a lot of ready-to-user CSS and components
 * https://getbootstrap.com/docs/3.3/css/[CSS-styles] for tables, buttons, images and more
