@@ -146,6 +146,33 @@ image::emmetAbbreviationPreview.png[]
 
 image::typeCheckingWithCtrlB.png[]
 
+=== Automatic Creation of Properties
+* instead of writing this:
+
+[source]
+----
+export class Ingredient {
+    public name: string;
+    public amount: number;
+
+    constructor(name: string, amount: number) {
+      this.name = name;
+      this.amount = amount;
+    }
+  }
+----
+
+* ... this can be written with the same result:
+[source]
+----
+export class Ingredient {
+
+  constructor(public name: string, public amount: number) {
+  }
+}
+----
+* properties will be automatically created and assigned with the parameters of the constructor
+
 == Bootstrap
 * https://getbootstrap.com[Bootstrap] = toolkit for HTML, CSS and JS that provides a lot of ready-to-user CSS and components
 * https://getbootstrap.com/docs/3.3/css/[CSS-styles] for tables, buttons, images and more
@@ -260,6 +287,22 @@ instead of
 
      [(ngModel)]="data"
 
+* Example: inserting images can be done two ways:
+** 1. String Interpolation:
+
+    <img
+        src="{{recipe.imagePath}}"
+        alt="{{recipe.name}}"
+        class="img-responsive" style="max-height: 50px;">
+
+** 2. Property Binding:
+
+    <img
+        [src]="recipe.imagePath"
+        alt="{{recipe.name}}"
+        class="img-responsive" style="max-height: 50px;">
+
+
 == Directives
 * = instructions in the DOM
 * "Angular, please add something to the DOM"
@@ -297,3 +340,9 @@ instead of
       offline: serverStatus === 'offline'
       }">
       Server with ID ...</p>
+
+== Models
+* for example recipe.model.ts
+* simple TypeScript file that contains the model of the data to display
+* no annotation like @Model because plain TypeScript class sufficient
+* best practice: if shared between multiple components, models should be put in a "shared"-folder directly below "app"
