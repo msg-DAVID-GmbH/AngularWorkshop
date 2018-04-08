@@ -4,7 +4,9 @@
 :sectnums:
 :imagesdir: images
 
-These are my notes and code snippets from the Udemy Workshop https://www.udemy.com/the-complete-guide-to-angular-2[The complete guide to Angular]. The "Course Project" is published https://github.com/stevenschwenke/AngularCourseProject[here].
+These are notes and code snippets from the Udemy Workshop https://www.udemy.com/the-complete-guide-to-angular-2[The complete guide to Angular]. The "Course Project" is published https://github.com/msg-DAVID-gmbh/AngularCourseProject[here].
+
+*This workshop is still in development.*
 
 == Introduction
 * Angular = framework for reactive single-page-applications
