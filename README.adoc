@@ -358,3 +358,32 @@ instead of
 * simple TypeScript file that contains the model of the data to display
 * no annotation like @Model because plain TypeScript class sufficient
 * best practice: if shared between multiple components, models should be put in a "shared"-folder directly below "app"
+
+== Components & Databinding
+* main question: How can data be passed between components?
+* Property- and Event Binding can be applied on:
+** HTML elements
+** directives
+** components
+* in component-binding, binding to self-specified, custom properties in self-written components
+* type-definition in TypeScript via Java Script object:
+[source]
+----
+export class MyWrapper {
+  element: {type: string, name: string, content: string};
+}
+----
+* this element is only part of this component and can not be accessed from outside
+* has to be explicitly exposed to the outside-world via a decorator:
+----
+export class MyWrapper {
+  @Input() element: {type: string, name: string, content: string};
+}
+----
+* this makes the property accessible to parent-components of this component (!)
+* name of property viewed by the outside can be changed. The following makes the property visible as "myUltracoolProperty":
+----
+export class MyWrapper {
+  @Input('myUltracoolProperty') element: {type: string, name: string, content: string};
+}
+----
