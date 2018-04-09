@@ -487,3 +487,26 @@ p {
 <button
   (click)="doStuff(myInput)">Click here</button>
 ----
+
+== Accessing DOM Elements via ElementRef
+* in template:
+[source]
+----
+<input
+  type="text"
+  #myInput>
+----
+* in TypeScript:
+[source]
+----
+export class ... {
+  @ViewChild('myInput') myInput : ElementRef;
+}
+----
+* argument of @ViewChild = name of local reference
+* ElementRef = type of all @ViewChild-annotated properties
+* getting underlying HTML-element:
+
+    myInput.nativeElement
+
+* ElementRef should only be used for accessing DOM-elements, not changing them!
