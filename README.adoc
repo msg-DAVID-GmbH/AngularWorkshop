@@ -239,12 +239,12 @@ instead of
 *** template of this component
 *** what is written in this file is being copied to wherever the component is being used
 ** *app.component.spec.ts*
-*** ?
+*** tests
 ** *app.component.ts*
 *** definition of the component
 *** defines the name (="selector") of the component ("app-root") with which it can be used in other HTML-files
 ** *app.module.ts*
-*** ?
+*** declarations and imports for the whole application
 * naming convention in Angular: [name of component].component.[file type], for example "server.component.ts" is the type script file for the server component
 * another aspect in Angular: "*Decorator*" = feature to enhance components with functionality, for example "@Component". Decorator needs information to know what to do with the annotated class, so a JSON object is provided:
 
