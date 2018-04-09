@@ -367,8 +367,10 @@ instead of
 ** HTML elements
 ** directives
 ** components
-* in component-binding, binding to self-specified, custom properties in self-written components
-* type-definition in TypeScript via Java Script object:
+** self-specified, custom properties in self-written components
+
+=== Sending data from parent component to child component
+* defining a property in a custom component via type-definition in TypeScript via Java Script object:
 [source]
 ----
 export class MyWrapper {
@@ -382,10 +384,64 @@ export class MyWrapper {
   @Input() element: {type: string, name: string, content: string};
 }
 ----
-* this makes the property accessible to parent-components of this component (!)
-* name of property viewed by the outside can be changed. The following makes the property visible as "myUltracoolProperty":
+* decorator has to be executed like a function, hence the parenthesis
+* "Input" because an event gets passed into the component
+* this makes the property accessible to *parent*-components of this component (!)
+* parent-component can now bind to this property
+* name of property viewed by the outside can be changed by using an alias. The following makes the property visible as "myUltracoolProperty":
 ----
 export class MyWrapper {
   @Input('myUltracoolProperty') element: {type: string, name: string, content: string};
 }
 ----
+
+=== Sending data from child-component to parent-component
+* = the other direction in regard to previous section
+* used to inform parent-component about changes occurring in child-component
+* in html of parent-component:
+[source]
+----
+<my-child-component (myEvent)="onEventThrown($event)"></my-child-component>
+----
+* = In defining the child-component within the parent-component, the event myEvent is defined as something that can be expected to occur. If thrown, method onEventThrown with the parameter $event will be executed - see TypeScript file of parent-component:
+[source]
+----
+export class MyParentComponent {
+...
+  onEventThrown(eventData: {x: string, y: string}) {
+  ...
+  }
+...
+}
+----
+* in child-TypeScript:
+[source]
+----
+export class MyChildComponent {
+  @Output() eventThrown = new EventEmitter<{x: string, y: string}>();
+  ...
+
+  someFunctionThatGetsCalledSometime() {
+    this.eventThrown.emit({'my x-value', 'my y-value'});
+  }
+}
+----
+* parenthesis at end of definition of eventThrown instantiate EventEmitter
+* "Output" because event gets passed out of the component
+* like with @Input, also alias possible:
+[source]
+----
+export class MyChildComponent {
+  @Output('mySpecialEventThrown') eventThrown = new EventEmitter<{x: string, y: string}>();
+  ...
+
+  someFunctionThatGetsCalledSometime() {
+    this.eventThrown.emit({'my x-value', 'my y-value'});
+  }
+}
+----
+
+=== Sending data between neighboring components
+* shown methods only allow data-passing between neighboring components via a parent-component that acts as a proxy
+* especially unpractical when components are located "far away" from each other
+* later another approach with Services shown
