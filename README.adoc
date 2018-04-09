@@ -510,3 +510,23 @@ export class ... {
     myInput.nativeElement
 
 * ElementRef should only be used for accessing DOM-elements, not changing them!
+* also available: @ContentChild = access to content from another component
+
+== Component Lifecycle
+* every lifecycle-step = hook that can be used to do things
+* Lifecycle of every component:
+1. *ngOnChanges* - whenever bound input property changes
+1. *ngOnInit* - initialization
+1. *ngDoCheck* - every change detection run (often!)
+1. *ngAfterContentInit* - content projected into view
+1. *ngAfterContentChecked* - content checked
+1. *ngAfterViewInit* - view has been initialized
+1. *ngAfterViewChecked* - view checked
+1. *ngOnDestroy* - called before destroying an object
+* ngOnChanges = only hook that recives an argument with some information:
+[source]
+----
+ ngOnChanges(changes: SimpleChanges) {
+  ...
+ }
+----
