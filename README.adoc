@@ -476,3 +476,14 @@ p {
 * ... will lead to all styles defined in this component to be applied globally
 * ViewEncapsulation.Native causes the Shadow-DOM function that isn't supported by all browsers
 * ViewEncapsulation.Emulated = default = recommended
+
+== Local References
+* (only!) in HTML-templates, local references can be defined and used (only) within this template (not in the TypeScript-file):
+[source]
+----
+<input
+  type="text"
+  #myInput>
+<button
+  (click)="doStuff(myInput)">Click here</button>
+----
