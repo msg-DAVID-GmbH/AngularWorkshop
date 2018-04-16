@@ -342,6 +342,18 @@ instead of
 
     <app-server *ngFor="let server of servers"></app-server>
 
+* another example for *ngIf with its else-part: only show a div if an item has been selected. If it hasn't been selected, show an infotext instead. This uses the local reference that is mentioned later in this tutorial.
+
+  <div class="col-md-3">
+    <app-detail
+      *ngIf="selectedItem; else infotext"
+      [selectedItem]="selectedItem"></app-detail>
+  </div>
+  <ng-template #infotext>
+    <p>Select an item!</p>
+  </ng-template>
+
+
 === Attribute Directives
 * attribute-directives change elements they are placed on:
 
