@@ -371,11 +371,18 @@ instead of
     <p>Select an item!</p>
   </ng-template>
 
+* attention: no more than one structural directive allowed on the same element
 
 === Attribute Directives
-* attribute-directives change elements they are placed on:
+* attribute-directives change elements they are placed on. Example for calling a method to get the color for a text:
 
     <p [ngStyle]="{color: getColor()}">Server with ID .. </p>
+
+* example for marking all odd lines have a yellow background and all even ones a transparent background:
+
+    <li
+      [ngStyle]="{backgroundColor: odd % 2 !== 0 ? 'yellow' : 'transparent'}"
+    ></li>
 
 * another attribute-directive to apply CSS-classes:
 
