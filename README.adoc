@@ -175,6 +175,24 @@ export class Ingredient {
 ----
 * properties will be automatically created and assigned with the parameters of the constructor
 
+=== Variable Declaration: var, let, const
+* three options for declaring variable: var, let, const
+
+==== var
+* spoiler alert: least preferable from the three options
+* traditional the way to declare a variable in JavaScript
+* available in TypeScript because TypeScript = superset of JavaScript
+* some odd "features" like "var-scoping": declarations of var are accessible anywhere, even globally. Details see https://www.typescriptlang.org/docs/handbook/variable-declarations.html[here]
+
+==== let
+* introduced because of the problems with var
+* block-scoped = not visible outside of the block let was defined in
+* behavior = expected behavior when coming from Java
+
+==== const
+* = augmentation of let; prevents re-assignment
+* principle of least privilege: const should be used whenever re-assignment of variable is not intended
+
 == Debugging
 === Developer Tools
 * main problem: TypeScript getting translated into JavaScript
