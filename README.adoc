@@ -370,24 +370,25 @@ instead of
 ** self-specified, custom properties in self-written components
 
 === Sending data from parent component to child component
-* defining a property in a custom component via type-definition in TypeScript via Java Script object:
-[source]
+* properties per default only part of their own component and not accessible from outside
+* has to be explicitly exposed to the outside-world via a decorator @Input:
 ----
-export class MyWrapper {
-  element: {type: string, name: string, content: string};
-}
-----
-* this element is only part of this component and can not be accessed from outside
-* has to be explicitly exposed to the outside-world via a decorator:
-----
-export class MyWrapper {
+export class MyChildComponent {
   @Input() element: {type: string, name: string, content: string};
 }
 ----
 * decorator has to be executed like a function, hence the parenthesis
 * "Input" because an event gets passed into the component
 * this makes the property accessible to *parent*-components of this component (!)
-* parent-component can now bind to this property
+* parent-component can now bind to this property (in template of parent component) (element in squared brackets is the property that gets bound):
+----
+<div>
+  <app-child-item
+    *ngFor="let element of elements"
+  [element]="element">
+  </app-child-item>
+</div>
+----
 * name of property viewed by the outside can be changed by using an alias. The following makes the property visible as "myUltracoolProperty":
 ----
 export class MyWrapper {
@@ -418,7 +419,7 @@ export class MyParentComponent {
 [source]
 ----
 export class MyChildComponent {
-  @Output() eventThrown = new EventEmitter<{x: string, y: string}>();
+  @Output() myEvent = new EventEmitter<{x: string, y: string}>();
   ...
 
   someFunctionThatGetsCalledSometime() {
@@ -426,6 +427,7 @@ export class MyChildComponent {
   }
 }
 ----
+* important: name of the event (in this case "myEvent") has to be the same in definition in child component TypeScript file as well as the parent component HTML template
 * parenthesis at end of definition of eventThrown instantiate EventEmitter
 * "Output" because event gets passed out of the component
 * like with @Input, also alias possible:
@@ -439,6 +441,12 @@ export class MyChildComponent {
     this.eventThrown.emit({'my x-value', 'my y-value'});
   }
 }
+----
+
+* EventEmitter can also pass a void value by setting "void":
+[source]
+----
+@Output() myEvent = new EventEmitter<void>();
 ----
 
 === Sending data between neighboring components
