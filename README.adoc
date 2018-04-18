@@ -111,6 +111,59 @@ These are notes and code snippets from the Udemy Workshop https://www.udemy.com/
 * http://www.jhipster.tech/jdl/[JDL = JHipster Domain Language]
 * https://start.jhipster.tech/jdl-studio/[JDL Studio] = Online Generator for JDL-files that can be imported into JHipster and entities are created
 
+== Package Management
+=== NPM
+* https://www.npmjs.com
+* Node Package Manager
+* = package manager for JavaScript
+* (a lot of languages have package managers: PHP has Composer, Python has PyPi, Java has Gradle and Maven, ...)
+* installing, sharing, distributing code
+* package.json contains external dependencies
+
+=== Yarn
+* = superset of NPM
+* = "Yet Another Resource Negotiator"
+* package manager that uses NPM registry as backend
+* yarn.lock file stores exact versions of dependencies
+* yarn updates yarn.lock automatically when dependencies are installed or updated (NPM needs the shrinkwrap command)
+* very fast compared to NPM because NPM installs sequentially, Yarn in parallel
+* installation for example:
+
+    yarn add --dev webpack
+
+* _--dev_ means that dependencies are installed in devDependencies array in package.json (for development) whereas omitting _--dev_ causes them to be installed in the dependencies-array (for production)
+* used to run commands like this to run all scripts in the "build" section of the package.json file:
+
+    yarn run build
+
+==== Error: command xyz not found when running "yarn start"
+* ran into this problem with "rimraf":
+
+    C:\repositories\xyz>yarn run build
+    yarn run v1.3.2
+    $ yarn run webpack:prod
+    $ yarn run cleanup && yarn run webpack:prod:main && yarn run clean-www
+    $ rimraf build/{aot,www}
+    Der Befehl "rimraf" ist entweder falsch geschrieben oder
+    konnte nicht gefunden werden.
+
+
+* solution: look at package.json: some dependencies have warnings that they are not installed. Alt+Enter and run "yarn install"
+
+=== Babel
+* JavaScript has different versions
+* Babel converts new JavaScript code into older versions
+* enables development with newest JS version without worrying about browser support
+
+=== Webpack
+* usage of for example SASS, PostCSS, minimizing CSS and minimizing JavaScript code with file webpack.config.js plus CLI command:
+
+    webpack
+
+* Webpack = modular build tool
+* *loaders* transform source code, for example style-loader adds CSS to DOM
+* *plugins* like UglifyJS minimizes output of webpack
+
 == Tooling
 * IntelliJ IDEA supports Angular right from the start:
 
