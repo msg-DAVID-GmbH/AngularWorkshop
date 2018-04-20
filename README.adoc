@@ -530,6 +530,44 @@ export class BetterHighlightDirective implements OnInit {
 
 * decorator _HostBinding_ gets the property of the hosting element to which the created property should be bound
 
+==== Setting values to custom directives
+[source]
+----
+@Directive({
+  selector: '[appBetterHighlight]'
+})
+export class BetterHighlightDirective implements OnInit {
+  @Input() defaultColor: string = 'transparent';
+  @Input() highlightColor: string = 'blue';
+  @HostBinding('style.backgroundColor') backgroundColor: string;
+
+  constructor(private elRef: ElementRef, private renderer: Renderer2) {}
+
+  ngOnInit() {
+    this.backgroundColor  = this.defaultColor;
+  }
+
+  @HostListener('mouseenter') mouseOver(eventData: Event) {
+    this.backgroundColor = this.highlightColor;
+  }
+
+  @HostListener('mouseleave') mouseOver(eventData: Event) {
+    this.backgroundColor = this.defaultColor;
+  }
+}
+----
+
+* used in HTML:
+[source]
+----
+<p appBetterHighlight [defaultColor]="'transparent'" [highlightColor]="'green'">My colored text</p>
+----
+* when strings are passed as parameters, shortcut: squared brackets and single quotation marks can be ommited
+[source]
+----
+<p appBetterHighlight [defaultColor]="'transparent'" highlightColor="green">My colored text</p>
+----
+
 == Models
 * for example recipe.model.ts
 * simple TypeScript file that contains the model of the data to display
