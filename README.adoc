@@ -477,7 +477,7 @@ export class BetterHighlightDirective implements OnInit {
 
     <p appBetterHighlight>My green text</p>
 
-* reaction to events also possible:
+==== React on events with @HostListener
 
 [source]
 ----
@@ -501,7 +501,34 @@ export class BetterHighlightDirective implements OnInit {
 }
 ----
 
-* _HostListener_ is provided with the name of an event (in this case _mouseenter_) on which the specified method shall be executed
+* decorator _HostListener_ is provided with the name of an event (in this case _mouseenter_) on which the specified method shall be executed
+
+==== Bind properties with @HostBinding
+[source]
+----
+@Directive({
+  selector: '[appBetterHighlight]'
+})
+export class BetterHighlightDirective implements OnInit {
+
+  constructor(private elRef: ElementRef, private renderer: Renderer2) {}
+
+  ngOnInit() {
+  }
+
+  @HostBinding('style.backgroundColor') backgroundColor: string = 'transparent';
+
+  @HostListener('mouseenter') mouseOver(eventData: Event) {
+    this.backgroundColor = 'green';
+  }
+
+  @HostListener('mouseleave') mouseOver(eventData: Event) {
+    this.backgroundColor = 'transparent';
+  }
+}
+----
+
+* decorator _HostBinding_ gets the property of the hosting element to which the created property should be bound
 
 == Models
 * for example recipe.model.ts
