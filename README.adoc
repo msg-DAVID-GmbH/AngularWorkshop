@@ -445,7 +445,7 @@ instead of
       }">
       Server with ID ...</p>
 
-=== Building own Directives
+=== Building own attribute Directive
 * to write own directives, either create new folder "better-highlight" with file "better-highlight.directive.ts" ...
 * ... or create everything needed for the directive "betterHighlight" with:
 
@@ -567,6 +567,40 @@ export class BetterHighlightDirective implements OnInit {
 ----
 <p appBetterHighlight [defaultColor]="'transparent'" highlightColor="green">My colored text</p>
 ----
+
+=== Building own structural Directive
+
+    ng g d unless
+
+* = opposite of ng-if directive
+
+[source]
+----
+@Directive({
+  selector: '[appUnless]'
+})
+export class UnlessDirective {
+  @Input() set appUnless(condition: boolean) {
+    if(!condition) {
+      this.vcRef.createEmbeddedView(this.templateRef);
+    } else {
+      this.vcRef.clear();
+    }
+  }
+
+  constructor(private templateRef: TemplateRef<any>, private vcRef: ViewContainerRef) {}
+
+}
+----
+
+* in HTML:
+[source]
+----
+<div *appUnless="onlyOddNmbersOrSomeOtherBooleanProperty">
+  ... stuff ...
+</div>
+----
+
 
 == Models
 * for example recipe.model.ts
