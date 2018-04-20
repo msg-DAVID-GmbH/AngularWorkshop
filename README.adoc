@@ -468,14 +468,40 @@ export class BetterHighlightDirective implements OnInit {
 
 * brackets in selector-name tell Angular that this is an attribute-directive
 * the parameters in the constructor are injected by Angular and even created if not existing
-* constructor parameter elementRef = element the directive has been placed on
+* constructor parameter _elementRef_ = element the directive has been placed on
 * _Renderer2_ is a better way of rendering elements - more methods see https://angular.io/api/core/Renderer2[here]
 * keyword _private_ in constructor triggers creation of property
-* directive doesn't have a view - hence only lifecycle hook onInit and onDestroy available
+* directive doesn't have a view - hence only lifecycle hook _onInit_ and _onDestroy_ available
 * new directives have to be added to app.module.ts in _declarations_
 * usage in HTML:
 
     <p appBetterHighlight>My green text</p>
+
+* reaction to events also possible:
+
+[source]
+----
+@Directive({
+  selector: '[appBetterHighlight]'
+})
+export class BetterHighlightDirective implements OnInit {
+
+  constructor(private elRef: ElementRef, private renderer: Renderer2) {}
+
+  ngOnInit() {
+  }
+
+  @HostListener('mouseenter') mouseOver(eventData: Event) {
+    this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'green');
+  }
+
+  @HostListener('mouseleave') mouseOver(eventData: Event) {
+    this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'transparent');
+  }
+}
+----
+
+* _HostListener_ is provided with the name of an event (in this case _mouseenter_) on which the specified method shall be executed
 
 == Models
 * for example recipe.model.ts
