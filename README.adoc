@@ -118,7 +118,8 @@ These are notes and code snippets from the Udemy Workshop https://www.udemy.com/
 * = package manager for JavaScript
 * (a lot of languages have package managers: PHP has Composer, Python has PyPi, Java has Gradle and Maven, ...)
 * installing, sharing, distributing code
-* package.json contains external dependencies
+* *package.json* contains external dependencies, however just the first layer of dependencies. The underlying layers will be resolved automatically.
+* *package-lock.json* is automatically created and contains the exact dependency tree and locks this tree to be used when resolving dependencies
 
 === Yarn
 * = superset of NPM
