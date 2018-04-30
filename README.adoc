@@ -910,7 +910,14 @@ export class MyDataService {
 ----
 * _@Injectable()_ should only be added if services are injected
 
-== JavaScript
-* returning an array from a method will return a reference to this array which could be used to alter the array. To avoid this:
+== Best Practices
+=== Returning "Defensive Copies" of Data
+* Returning an array from a method this way will return a reference to this array which could be used to alter the array:
+
+    return this.data;
+
+* making it safer with returning a slice (=copy) of the array:
 
     return this.data.slice();
+
+* however, changes on the array will not migrate to every component that uses the original data. Solution: informing components of new data with event-emitters
