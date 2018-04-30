@@ -786,3 +786,131 @@ export class ... {
   ...
  }
 ----
+
+== Services and Dependency Injection
+* Service
+** can be used throughout the application to avoid duplication of code
+** hold data
+** used to communicate between components
+* should be located near the other classes implementing the business feature of this service
+
+=== Simple Service
+* service is just a normal TypeScript-class! No _@Service_-decorator!
+[source]
+----
+export class LoggingService {
+  logSomethingToConsole(message: string) {
+    console.log('This got logged: ' + message);
+  }
+}
+----
+
+* instances of services should be created by Angular via dependency injection, not manually. Therefore, two things necessary:
+1. _provider_ with type of service
+1. dependency injection in constructor
+
+[source]
+----
+@Component({
+  selector: 'my-cool-component',
+  templateUrl: './my-cool.component.html',
+  styleUrls: ['./my-cool.component.css'],
+  providers: [LoggingService]
+})
+export class MyCoolComponent {
+
+  constructor(private loggingService: LoggingService) {}
+
+  ...
+}
+----
+
+=== Data-holding Service
+[source]
+----
+export class MyDataService {
+  myData = [
+    {
+      id: 1,
+      name: 'data 1'
+    },
+    {
+      id: 2,
+      name: 'data 2'
+    },
+    {
+      id: 3,
+      name: 'data 3'
+    }
+  ];
+
+  addData(id: number, name: string) {
+    this.myData.push({id: id, name: name});
+  }
+}
+----
+* every component using this data must hold a copy of it:
+[source]
+----
+@Component({
+  selector: 'my-cool-component',
+  templateUrl: './my-cool.component.html',
+  styleUrls: ['./my-cool.component.css'],
+  providers: [MyDataService]
+})
+export class MyCoolComponent implements OnInit {
+
+  data: {id: number, name: string}[] = [];
+
+  constructor(private myDataService: MyDataService) {}
+
+  ngOnInit() {
+    this.data = this.myDataService.myData;
+  }
+
+  ...
+}
+----
+* initialization of data array should not be done in constructor, but in _onInit_!
+
+=== Hierarchical Injection
+* services injected in one component can be used in all its child-components
+* hence: if service provided in AppModule, this instance is available in all other components throughout the application
+* if a service is *provided* in two components of the same tree, different instances of this service will be created!
+* to have the same instance in two components, parent component needs entry in _providers_ *and* injection in constructor; child component *only needs injection in constructor*
+
+=== Injecting Services into Services
+* *_@Injectable()_* means, that there can be other services injected into the annotated service:
+[source]
+----
+@Injectable()
+export class MyDataService {
+  myData = [
+    {
+      id: 1,
+      name: 'data 1'
+    },
+    {
+      id: 2,
+      name: 'data 2'
+    },
+    {
+      id: 3,
+      name: 'data 3'
+    }
+  ];
+
+  constructor(private logginService: LoggingService) {}
+
+  addData(id: number, name: string) {
+    this.myData.push({id: id, name: name});
+    this.loggingService.logSomethingToConsole('new data added!');
+  }
+}
+----
+* _@Injectable()_ should only be added if services are injected
+
+== JavaScript
+* returning an array from a method will return a reference to this array which could be used to alter the array. To avoid this:
+
+    return this.data.slice();
