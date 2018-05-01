@@ -910,6 +910,473 @@ export class MyDataService {
 ----
 * _@Injectable()_ should only be added if services are injected
 
+== Routing
+* allows to change URL, so it seems to be a multi-site-application, however it's still a single-page-application
+* example: localhost:4200/users loading _UsersComponent_
+
+=== Setup
+* routes registered in _app.module.ts_:
+
+[source]
+----
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'users', component: UsersComponent },
+  { path: 'data', component: DataComponent }
+];
+
+@NgModule({
+...
+  imports: [
+    ...
+    RouterModule.forRoot(appRoutes)
+    ...
+  ],
+...
+
+----
+
+in _app.component.html_: definition of where the router should load the currently selected route:
+
+    <router-outlet></router-outlet>
+
+=== Router Links
+* *wrong* way: using _a href_ tag like this:
+
+    <a href="/users">Users</a>
+
+* this will reload the app every time the link is clicked, which will reset the state of the whole app
+* instead use _routerLink_ directive:
+
+    <a routerLink="/users">Users</a>
+
+* difference between an absolute path like "_/users_" and a relative path like "_users_": relative path gets appended to the current URL, so when  already on localhost:4200/users and clicking the relative path: localhost:4200/users/users
+* also possible to navigate to other paths with
+
+    <a routerLink="../../users">Users</a>
+
+* router links with _routerLink_-directive != normal links, hence no automatic CSS styling. Solution: _routerLinkActive_-directory will attach specified class _active_ when route is active :
+
+  <li routerLinkActive="active"><a routerLink="/users">Users</a>
+  <li routerLinkActive="active"><a routerLink="/data">Data</a>
+
+* Problem with this: if route "_/_" is configured this way, it will always be styled with _active_ because "/" is included in "_/users_" and "_/data_". Solution:
+
+  <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><a routerLink="/">Home</a>
+  <li routerLinkActive="active"><a routerLink="/users">Users</a>
+  <li routerLinkActive="active"><a routerLink="/data">Data</a>
+
+=== Programmatically visit Routes
+
+    <button (click)="onLoadServers()">Load Route</button>
+
+[source]
+----
+constructor(private router: Router) {}
+
+onLoadServers() {
+  this.router.navigate(['/servers']);
+}
+----
+
+* With _routerLink_, relative paths such as "_users_" would result in visiting for example localhost:4200/users/users. With _navigate()_ this is not the case:
+
+[source]
+----
+constructor(private router: Router) {}
+
+onLoadServers() {
+  this.router.navigate(['servers']);
+}
+----
+
+* Reason: by default, _navigate()_ targets the root domain, hence it makes no difference if _/servers_ or _servers_ is configured. Changeable with
+
+[source]
+----
+constructor(private router: Router,
+            private route ActivatedRoute) {}
+
+onLoadServers() {
+  this.router.navigate(['servers'], {relativeTo: this.route});
+}
+----
+
+=== Passing Parameters as/into Dynamic Routes
+* example:
+
+    localhost:4200/users/10/Anna
+
+* to load users with specific ID via URL, in _app.module.ts_:
+
+[source]
+----
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'users', component: UsersComponent },
+  { path: 'users/:id:name', component: UsersComponent },
+  { path: 'data', component: DataComponent }
+];
+
+@NgModule({
+...
+  imports: [
+    ...
+    RouterModule.forRoot(appRoutes)
+    ...
+  ],
+...
+
+----
+
+* in component:
+
+[source]
+----
+constructor(private route: ActivatedRoute) {}
+
+ngOnInit() {
+  this.user = {
+    id: this.route.snapshot.params['id'],
+    name: this.route.snapshot.params['name']
+  };
+}
+----
+
+* _'id'_ and _'name'_ in _ngOnInit()_ is parsed from the URL, see above in _app.modules.ts_: _path: 'users/:id:name'_
+* *Attention: order of routes important*: In this example here, calls to /new will cause the first route to load with an error, because "new" will be interpreted as the _id_. Solution: define path with variables last:
+
+      {path: ':id/edit ', component: RecipeEditComponent},
+      {path: 'new', component: RecipeEditComponent}
+
+==== Calling Routes with Parameters programmatically
+    <a [routerLink]="['/users', 10, 'Anna']">Link to Anna</a>
+
+this will change the URL, but Angular won't reload the data - has to be triggered:
+
+[source]
+----
+constructor(private route: ActivatedRoute) {}
+
+ngOnInit() {
+  this.user = {
+    id: this.route.snapshot.params['id'],
+    name: this.route.snapshot.params['name']
+  };
+  this.route.params.subscribe(
+    (params: Params) => {
+      this.user.id = params['id'];
+      this.user.name = params['name'];
+    }
+  );
+}
+----
+
+=== Passing Parameters as Query Parameters
+* Example:
+
+    localhost:4200/users/10/Anna/edit?role=admin&mode=test#loading
+
+* question mark = separation to URL
+* ampersands = separation between multiple parameters
+* hash-sign = jump to specific position in page
+
+[source]
+----
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'users/:id:name/edit', component: EditUsersComponent },
+];
+
+@NgModule({
+...
+  imports: [
+    ...
+    RouterModule.forRoot(appRoutes)
+    ...
+  ],
+...
+
+----
+
+    <a
+    [routerLink]="['/users', 10, 'Anna', 'edit']"
+    [queryParams]="{role: 'admin', mode: 'test'}"
+    [fragment]="'loading'"
+    >Link to Anna</a>
+
+* calling this programmatically:
+
+[source]
+----
+constructor(private router: Router) {}
+
+onLoadUser(id: number, name: string) {
+  this.router.navigate(
+    ['/users', id, name, 'edit'],
+    {queryParams: {role: 'admin', mode: 'test'}
+    fragment: 'loading'}
+    );
+}
+----
+
+* retrieving data:
+
+[source]
+----
+constructor(private route: ActivatedRoute) {}
+
+ngOnInit() {
+  // as before, this will not react to changes:
+  console.log(this.route.snapshot.queryParams);
+  console.log(this.route.snapshot.fragment);
+
+  // ... this will:
+  this.route.queryParams.subscribe(...);
+  this.route.fragment.subscribe(...);
+}
+----
+
+* pitfall: If variables in component are of type number and should be read from the always-string-valued URL, cast necessary via "_+_":
+
+    const id = +this.route.snapshot.params['id'];
+
+=== Child-Routing
+* when visiting route, whole page is loaded
+* use-case: only load part of page
+* also useful for getting rid of duplication - see this code where many entries begin with "_users_":
+
+[source]
+----
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'users', component: UsersComponent },
+  { path: 'users/:id', component: UsersComponent },
+  { path: 'users/:name', component: UsersComponent },
+];
+----
+
+* solution:
+
+[source]
+----
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'users', component: UsersComponent, children: [
+     { path: ':id', component: UsersComponent },
+     { path: ':name', component: UsersComponent }
+     ]
+   },
+];
+----
+
+* Child-Routes need a router-outlet *in the users-component*
+* one existing outlet in _app.component.html_ only for root-routes, in this case _users_
+* new outlet in users-component will automatically used for all child-routes of users
+
+=== Preserving parameters when routing
+* problem: when calling _router.navigate_, all parameters are removed from URL
+* solution:
+
+[source]
+----
+this.router.navigate(
+    ['/users', id, name, 'edit'],
+    {relativeTo: this.route, queryParamsHandling: 'merge'}
+    );
+----
+
+* _queryParamsHandling_:
+** merge = merge new and old parameters
+** preserve = overwrite new ones with old ones
+
+=== Redirect
+* if user visits non-existing page (by manually typing URL), error-page should be displayed
+
+[source]
+----
+
+const appRoutes: Routes = [
+  ...
+  { path: 'not-found', component: NotFoundComponent },
+  { path: '**', redirectTo: '/not-found' }
+];
+----
+
+* *important*: redirect has to be the last entry in routes-array!
+* another configuration:
+[source]
+----
+const appRoutes: Routes = [
+  {path: '', redirectTo: '/recipes', pathMatch: 'full'},
+  {path: 'recipes', component: RecipesComponent},
+  {path: 'shopping-list', component: ShoppingListComponent}
+];
+----
+* first path with empty URL needs _pathMatch_ because empty URL is part of every URL, hence this redirect would always apply. _pathMath: 'full'_ forces the full path to be the empty URL to match this redirect, hence only empty URL will be redirected.
+
+=== Route Guards
+* _auth-guard.service.ts_ = normal service, but responsible for guarding
+* method _canActivate_ either returns an Observable, a Promise or a boolean
+* _AuthService_ = service that asks server for permissions
+* _AuthService.isAuthenticated()_ returns a promise
+
+[source]
+----
+@Injectable()
+export class AuthGuard implements CanActivate {
+
+  constructor(private authService: AuthSerice, private router: Router) {}
+
+  canActivate(route: ActivatedRouteSnapshot,
+              state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+
+    return this.authService.isAuthenticated()
+      then(
+        (authenticated: boolean) => {
+          if(authenticated) {
+            return true;
+          } else {
+            this.router.navigate(['/']);
+          }
+        }
+      );
+  }
+}
+----
+
+* to use this guard, in _app-routing.module.ts_:
+[source]
+----
+
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'users', canActivate: [AuthGuard], component: UsersComponent, children: [
+     { path: ':id', component: UsersComponent },
+     { path: ':name', component: UsersComponent }
+     ]
+   },
+];
+----
+
+* also, _AuthGuard_ will have to be added as a provider in _app.module.ts_
+* _users_ and all child-routes will be guarded
+* to guard child-modules:
+** implement interface _CanActivateChild_
+** use _canActivateChild_ in _const appRoutes_ in _app-routing.module.ts_
+* other guard: _canDeactivate_ to react on leaving a route
+
+=== Passing static Data to a Route
+[source]
+----
+const appRoutes: Routes = [
+  ...
+  { path: 'not-found', component: NotFoundComponent, data: {message: 'Page not found'} },
+  { path: '**', redirectTo: '/not-found' }
+];
+----
+can be used in _NotFoundComponent_:
+[source]
+----
+export class NotFoundComponent implements OnInit {
+  errorMessage: string;
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.errorMessage = this.route.snapshot.data['message'];
+
+    // if data in route changes, observe these changes:
+    this.route.data.subscribe(
+      (data: Data) => {
+        this.errorMessage = data['message'];
+      }
+    );
+  }
+}
+----
+
+=== Passing dynamic Data to a Route
+* Resolver loads data *before* displaying the route. In contrast: loading a route and displaying it and *after* that load data in _onInit()_ also works.
+
+[source]
+----
+
+interface User {
+  id: number;
+  name: string
+}
+
+@Injectable()
+export class UserResolver implements Resolve<User> {
+
+  constructor(private userService: UserService) {}
+
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<User> | Promise<User> | User {
+    return this.userService.getUser(+route.params['id']);
+  }
+}
+----
+
+* in _app-routing.modules.ts_:
+[source]
+----
+const appRoutes: Routes = [
+  ...
+  const appRoutes: Routes = [
+    { path: '', component: HomeComponent },
+    { path: 'users', canActivate: [AuthGuard], component: UsersComponent, children: [
+       { path: ':id', component: UsersComponent, resolve: {user: UserResolver} },
+       { path: ':name', component: UsersComponent }
+       ]
+     },
+  ];
+];
+----
+
+* in _user.component.ts_:
+[source]
+----
+...
+ngOnInit() {
+  this.route.data
+    .subscribe(
+      (data: Data) => {
+        this.user = data['user'];
+      }
+      );
+}
+...
+----
+
+=== Location Strategies
+* in real deployment: paths like "myApp:4200/servers" may not be resolved because server may look for a server.html file (which doesn't exist)
+* solution: route all requests to index.html (because that's where Angular is)
+* best solution: configure server
+* alternative solution: in _app-routing.module.ts_:
+
+[source]
+----
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes, {useHash: true});
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+}
+
+----
+
+* leads to URLs including hash-tag: localhost:4200/#/users
+* = "hash-mode routing"
+* hash-tag separates part that's interesting to server (before tag) and that's interesting for Angular (after tag)
+
 == Best Practices
 === Returning "Defensive Copies" of Data
 * Returning an array from a method this way will return a reference to this array which could be used to alter the array:
@@ -921,3 +1388,33 @@ export class MyDataService {
     return this.data.slice();
 
 * however, changes on the array will not migrate to every component that uses the original data. Solution: informing components of new data with event-emitters
+
+=== Outsourcing Route Configuration
+* more complex route configuration shouldn't be in app.modules.ts, but exported to another class like _AppRoutingModule_ in _app-routing.module.ts_:
+
+[source]
+----
+const appRoutes: Routes = [
+  ...
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(appRoutes);
+  ],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+}
+----
+
+in _app.module.ts_:
+[source]
+----
+...
+imports: [
+  ...
+  AppRoutingModule
+],
+...
+----
