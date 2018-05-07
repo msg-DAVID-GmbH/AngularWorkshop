@@ -697,6 +697,8 @@ export class MyChildComponent {
 @Output() myEvent = new EventEmitter<void>();
 ----
 
+* *important*: _EventEmitters_ are _Subjects_ (see below) and should only be used for _@Output_, see https://stackoverflow.com/questions/40238549/angular-2-event-emitters-vs-subject[stackoverflow] and https://netbasal.com/event-emitters-in-angular-13e84ee8d28c[this post].
+
 === Sending data between neighboring components
 * shown methods only allow data-passing between neighboring components via a parent-component that acts as a proxy
 * especially unpractical when components are located "far away" from each other
@@ -1376,6 +1378,169 @@ export class AppRoutingModule {
 * leads to URLs including hash-tag: localhost:4200/#/users
 * = "hash-mode routing"
 * hash-tag separates part that's interesting to server (before tag) and that's interesting for Angular (after tag)
+
+== Observables
+* *attention*: slightly different syntax with Angular 6 which uses RXJS 6
+* observables over three callbacks:
+
+[source]
+----
+this.route.params
+  .subscribe(
+    (params: Params) => {
+      // next- callback
+    },
+    () => {
+      // error- callback
+    },
+    () => {
+      // complete- callback
+    }
+  );
+----
+
+* note: error- and complete-callback don't make much sense in this case of router-parameters
+
+=== Building an Observable
+* many ways of creating observable - only most common ways shown here. Complete documentation see http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-create[RxJS docs]
+[source]
+----
+// Emit a new number counting from 0 upwards every second
+const myNumbers = Observable.interval(1000);
+myNumbers.subscribe(
+  (number: number) => {
+    console.log(number);
+  }
+);
+----
+
+[source]
+----
+// Building an observable from scratch
+const myObervable = Observable.create((observer: Observer<string>) => {
+
+  setTimeout(() => {
+    // emit a normal data package that can be catched by the observer with the first parameter
+    observer.next('first package');
+  },2000);
+
+  setTimeout(() => {
+    observer.next('second package');
+  },4000);
+
+  setTimeout(() => {
+    observer.error('this does not work');
+  },5000);
+
+});
+
+myObservable.subscribe(
+  (data: string) => {
+    console.log(data);
+  },
+  (error: string) => {
+    console.log(error);
+  },
+  () => {
+    console.log('completed!');
+  }
+);
+----
+
+=== Unsubscribing
+* subscriptions to observables still existing, even when component holding observable gets destroyed (by page-change)
+* hence: always unsubscribe!
+* first example with whole class and unsubscription:
+
+[source]
+----
+export class HomeComponent implements OnInit, OnDestroy {
+
+  numbersObservablesSubscription: Subscription;
+
+  constructor() { }
+
+  ngOnInit() {
+
+    // Emit a new number counting from 0 upwards every second
+    const myNumbers = Observable.interval(1000);
+    this.numbersObservableSubscription = myNumbers.subscribe(
+      (number: number) => {
+        console.log(number);
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.numbersObservablesSubscription.unsubscribe();
+  }
+}
+----
+
+* Angular's observables clean up automatically - but best practice to unsubscribe nevertheless
+
+=== Subject
+* subject = observable and observer at the same time!
+[source]
+----
+export class UserService {
+  userActivated = new Subject();
+
+  someMethod() {
+    this.userActivated.subscribe(
+      (id: number) => {
+        // some business-logic with id
+      }
+    );
+  }
+}
+----
+
+[source]
+----
+// ... in the class that uses the UserService ...
+onActivate() {
+  // acting as an observer but also pushing own user-id back
+  this.usersService.userActivated.next(this.id);
+}
+----
+
+* *important*: _EventEmitters_ are _Subjects_ and should only be used for _@Output_, see https://stackoverflow.com/questions/40238549/angular-2-event-emitters-vs-subject[stackoverflow] and https://netbasal.com/event-emitters-in-angular-13e84ee8d28c[this post].
+
+=== Operators
+* a lot of operators available, see http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#static-method-create[RxJS docs]
+* one example:
+
+[source]
+----
+const myNumbers = Observable.interval(1000)
+  .pipe(.map(
+    (data: number) => {
+      return data * 2;
+    }
+  ));
+----
+
+=== RXJS 5 vs 6
+adding this to package.json ...
+
+    "rxjs": "^6.0.0-rc.0",
+
+will cause this error:
+
+    error TS2305: Module .... has no exported member 'Subject'.
+
+Solution: in every (!) class, write
+
+    import { Subject } from 'rxjs';
+
+instead of
+
+    import { Subject } from 'rxjs/Subject';
+
+Also important for every other class:
+
+    import { Subject, Observable, Observer, Subscription } from 'rxjs';
 
 == Best Practices
 === Returning "Defensive Copies" of Data
