@@ -496,7 +496,7 @@ export class BetterHighlightDirective implements OnInit {
     this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'green');
   }
 
-  @HostListener('mouseleave') mouseOver(eventData: Event) {
+  @HostListener('mouseleave') mouseLeave(eventData: Event) {
     this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'transparent');
   }
 }
@@ -1119,7 +1119,7 @@ constructor(private router: Router) {}
 onLoadUser(id: number, name: string) {
   this.router.navigate(
     ['/users', id, name, 'edit'],
-    {queryParams: {role: 'admin', mode: 'test'}
+    {queryParams: {role: 'admin', mode: 'test'},
     fragment: 'loading'}
     );
 }
@@ -1555,7 +1555,7 @@ Also important for every other class:
 * however, changes on the array will not migrate to every component that uses the original data. Solution: informing components of new data with event-emitters
 
 === Outsourcing Route Configuration
-* more complex route configuration shouldn't be in app.modules.ts, but exported to another class like _AppRoutingModule_ in _app-routing.module.ts_:
+* more complex route configuration shouldn't be in _app.modules.ts_, but exported to another class like _AppRoutingModule_ in _app-routing.module.ts_:
 
 [source]
 ----
