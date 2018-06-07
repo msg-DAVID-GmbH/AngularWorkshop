@@ -1542,6 +1542,414 @@ Also important for every other class:
 
     import { Subject, Observable, Observer, Subscription } from 'rxjs';
 
+== Forms
+* two approaches:
+** template-driven (write form in HTML, Angular infers form object from it that ultimately is used in Java Script)
+** reactive (write form in Type Script and HTML, Angular doesn't infer or create anything)
+
+=== Template-Driven
+* import _FormsModule_ in _app.module.ts_
+* submit-functionality should *not* be in HTML in button with _type="submit"_ because click here causes build-in functionality that collides with how Angular works - instead:
+[source]
+----
+<form (ngSubmit)="onSubmit(f)" #f="ngForm">
+----
+* local reference _f_ is used as a parameter for _onSubmit()_ and provides access to this form - however, strange syntax necessary
+
+* _ngModel_ directive added in HTML = making Angular aware that HTML element should be a control:
+[source]
+----
+<input
+  type="text"
+  id="username"
+  class="form-control"
+  ngModel
+  name="username"
+  >
+----
+* _name_ can be added to every HTML control (not Angular-specific) and serves as connector between template and TypeScript
+* in TypeScript:
+
+[source]
+----
+onSubmit(form: NgForm) {
+  console.log(form.value.username);
+}
+----
+* object of type _NgForm_ provides access to the form, including all controls and the data from the form
+
+==== Validation
+* _valid_-field in NgForm dependent on validation
+* validation causes CSS classes to be added to components in form, for example _ng-dirty_, _ng-valid_ - that can be added to the CSS file of the component
+* however, still possible to enter every input string - validation has to be handled programmatically!
+* _ngModel_ added to tell Angular that _input_ is a control (however, value of input field not bound!)
+* invalid if empty:
+
+[source]
+----
+<input
+  type="text"
+  id="username"
+  class="form-control"
+  ngModel
+  name="username"
+  required>
+----
+* invalid if empty and validation of email:
+[source]
+----
+<input
+  type="email"
+  id="email"
+  class="form-control"
+  ngModel
+  name="email"
+  required
+  email
+  >
+----
+* https://angular.io/api/forms/Validators[list of all validators]
+* HTML 5 Validation enable by adding _ngNativeValidate_ to a control
+* example: disabling submit-button:
+[source]
+----
+<button
+  class="btn btn-primary"
+  type="submit"
+  [disabled]="!f.valid">Submit</button>
+----
+
+* example: showing help text:
+[source]
+----
+<input
+  type="email"
+  id="email"
+  class="form-control"
+  ngModel
+  name="email"
+  required
+  email
+  #email="ngModel">
+  <span class="help-block" *ngIf="!email.valid && email.touched">Please enter valid email</span>
+----
+
+* using regular expressions to only make positive numbers valid:
+[source]
+----
+<label for="amount">Amount</label>
+<input
+  type="number"
+  id="amount"
+  class="form-control"
+  name="amount"
+  ngModel
+  required
+  pattern="^[1-9]+[0-9]*$"
+>
+----
+
+==== Default Texts
+[source]
+----
+<select
+  id="secret"
+  class="form-control"
+  [ngModel]="'default-value'"
+  name="secret">
+----
+* This can also be bound (one-way!) to a property: _[ngModel]="myProperty"_
+
+==== Binding
+* non-binding = simply adding _ngModel_ in HTML = declaring input as control
+* one-way-binding see above
+* two-way-binding (property in Type Script file omitted):
+[source]
+----
+<textarea
+  name="questionAnswer"
+  rows="3"
+  [(ngModel)]></textarea>
+<p>Your reply: {{ answer }}</p>
+----
+
+==== Setting Value of Input programmatically
+[source]
+----
+export class AppComponent {
+  @ViewChild('f') myForm: NgForm;
+
+  patchValueIntoMyForm() {
+
+    this.myForm.form.patchValue({
+      username: suggestedName
+    });
+  }
+}
+----
+* also available: _setValue_ which will set values in every element of the _form_
+
+==== Grouping
+* goal: groups of inputs in result object
+[source]
+----
+<div ... ngModelGroup="userData">
+  ... some components ...
+</div>
+----
+* _ngModelGroup_ forms a group of all the inputs in the div in the field "userData"
+* group also has properties like valid or touched, so whole groups can be validated
+
+=== Reactive Forms
+* in _app.module.ts_, import _ReactiveFormsModule_
+* simple form:
+[source]
+----
+export class AppComponent implements OnInit {
+  genders = ['male', 'female'];
+  signupForm: FormGroup;
+
+  ngOnInit() {
+    this.signupForm = new FormGroup({
+      'username': new FormControl('Default User Name'),
+      'email': new FormControl(null),
+      'gender': new FormControl('male')
+    });
+  }
+
+  onSubmit() {
+    console.log(this.signupForm);
+  }
+}
+----
+[source]
+----
+<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+  <input
+    type="text"
+    id="username"
+    formControlName="username"
+    class="form-control">
+  <input
+    type="text"
+    id="email"
+    formControlName="email"
+    class="form-control">
+  <input
+    type="radio"
+    formControlName="gender"
+    value="male"
+</form>
+----
+
+==== Validation
+[source]
+----
+export class AppComponent implements OnInit {
+  genders = ['male', 'female'];
+  signupForm: FormGroup;
+
+  ngOnInit() {
+    this.signupForm = new FormGroup({
+      'username': new FormControl('Default User Name', Validators.required),
+      'email': new FormControl(null, [Validators.required, Validators.email]),
+      'gender': new FormControl('male', Validators.required)
+    });
+  }
+
+  onSubmit() {
+    console.log(this.signupForm);
+  }
+}
+----
+
+==== Getting access to Data
+[source]
+----
+<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+  <input
+    type="text"
+    id="username"
+    formControlName="username"
+    class="form-control">
+  <input
+    type="text"
+    id="email"
+    formControlName="email"
+    class="form-control">
+    <span class="help-block" *ngIf="!signupForm.get('email').valid && signupForm.get('email').touched">Please enter valid email</span>
+  <input
+    type="radio"
+    formControlName="gender"
+    value="male"
+</form>
+----
+
+==== Grouping
+[source]
+----
+export class AppComponent implements OnInit {
+  genders = ['male', 'female'];
+  signupForm: FormGroup;
+
+  ngOnInit() {
+    this.signupForm = new FormGroup({
+      'userData': new FormGroup({
+        'username': new FormControl('Default User Name', Validators.required),
+        'email': new FormControl(null, [Validators.required, Validators.email])
+      }),
+      'gender': new FormControl('male', Validators.required)
+    });
+  }
+
+  onSubmit() {
+    console.log(this.signupForm);
+  }
+}
+----
+[source]
+----
+<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+  <div formGroupName="userData">
+    <input
+      type="text"
+      id="username"
+      formControlName="username"
+      class="form-control">
+    <input
+      type="text"
+      id="email"
+      formControlName="email"
+      class="form-control">
+      <span class="help-block" *ngIf="!signupForm.get('userData.email').valid && signupForm.get('userData.email').touched">Please enter valid email</span>
+  </div>
+  <input
+    type="radio"
+    formControlName="gender"
+    value="male"
+</form>
+----
+
+==== Dynamically adding Components
+[source]
+----
+export class AppComponent implements OnInit {
+  genders = ['male', 'female'];
+  signupForm: FormGroup;
+
+  ngOnInit() {
+    this.signupForm = new FormGroup({
+      'userData': new FormGroup({
+        'username': new FormControl('Default User Name', Validators.required),
+        'email': new FormControl(null, [Validators.required, Validators.email])
+      }),
+      'gender': new FormControl('male', Validators.required),
+      'hobbies': new FormArray([])
+    });
+  }
+
+  onSubmit() {
+    console.log(this.signupForm);
+  }
+
+  onAddHobby() {
+    // Cast to array necessary
+    (<FormArray>this.signupForm.get('hobbies')).push(new FormControl(null));
+  }
+}
+----
+[source]
+----
+<div formArrayName="hobbies">
+  <div
+    class="form-group"
+    *ngFor="let hobbyControl of signupForm.get('hobbies').controls; let i = index>
+    <input type="text" class="form-control" [formControlName]="i">
+  </div>
+</div>
+----
+
+==== Custom Validators
+* Validator = function that gets called automatically
+
+[source]
+----
+export class AppComponent implements OnInit {
+  signupForm: FormGroup;
+
+  ngOnInit() {
+    this.signupForm = new FormGroup({
+      'username': new FormControl('Default User Name', [Validators.required, this.forbiddenNames.bind(this)])
+    });
+  }
+}
+----
+
+* _this.forbiddenNames.bind(this)_ necessary to make _this_ work in the function here:
+
+[source]
+----
+export class AppComponent {
+  forbiddenUsernames = ['X', 'Y'];
+
+  forbiddenNames(control: FormControl): {[s: string]: boolean} {
+    if(this.forbiddenUsernames.indexOf(control.value) !== -1) {
+      return {'nameIsForbidden': true};
+    }
+
+    // if validation successfull, null or nothing should be returned
+    return null;
+  }
+
+}
+----
+* Angular adds failed validations as error codes in the result object, which then can be used for special error messages for example
+
+==== Asynchronous Validation
+* for example when calling server for validation
+* asynchronous validators passed as 3rd parameter in form creation:
+
+[source]
+----
+
+export class AppComponent implements OnInit {
+  signupForm: FormGroup;
+
+  ngOnInit() {
+    this.signupForm = new FormGroup({
+      'email': new FormControl(null, [Validators.required, Validators.email], this.forbiddenEmails)
+    });
+  }
+}
+
+forbiddenEmails(control: FormControl): Promise<any> | Observable<any> {
+  const promise = new Promise<any>((resolve, reject) => {
+    setTimeout(() => {
+      if(control.value === 'my@mailadress.com') {
+        resolve({emailIsForbidden': true});
+      else {
+        resolve(null);
+      }
+    },1500);
+  });
+  return promise;
+}
+----
+
+==== Listening to Changes
+[source]
+----
+// fires whenever a value of a form changes, for example when user inputs data
+this.signupForn.valueChanges.subscribe(
+  (value) => console.log(value);
+);
+
+// Status of the form, like invalid, valid or pending
+this.signupForn.statusChanges.subscribe(
+  (status) => console.log(status);
+);
+----
+
 == Best Practices
 === Returning "Defensive Copies" of Data
 * Returning an array from a method this way will return a reference to this array which could be used to alter the array:
@@ -1583,3 +1991,7 @@ imports: [
 ],
 ...
 ----
+
+== Acknowledgements
+
+A huge thank you to Maximilian Schwarzmüller, who created such a great Udemy workshop that was the base for this repository, and who agreed to the contents of this repo.
