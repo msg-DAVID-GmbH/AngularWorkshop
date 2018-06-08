@@ -1992,6 +1992,91 @@ imports: [
 ...
 ----
 
+== Pipes
+* transforms output in template without changing actual data
+* example: make certain string uppercase without changing saved data:
+
+[source]
+----
+{{ myString | uppercase }}
+----
+
+* format dates:
+
+[source]
+----
+{{ server.started | date }}
+----
+
+* parametrize pipes (multiple parameters via multiple colons):
+[source]
+----
+{{ server.started | date:'fullDate' }}
+...
+<li *ngFor="let i of collection | slice:1:3">{{i}}</li>
+----
+
+* chaining of pipes:
+[source]
+----
+{{ server.started | date:'fullDate' | uppercase}}
+----
+
+* https://angular.io/api?type=pipe[built-in pipes in Angular here]
+
+=== Creating own Pipes
+
+* console:
+[source]
+----
+ng g p shorten
+----
+
+* _shorten.pipe.ts_:
+[source]
+----
+@Pipe({
+  name: 'shorten'
+})
+export class ShortenPipe implements PipeTransform {
+
+  transform(value: any, limit: number) {
+    return value.substr(0, limit);
+  }
+}
+----
+* for pipes without parameters just omit the second parameter
+
+* in _app.module.ts_:
+[source]
+----
+...
+declarations: [
+  ...
+  ShortenPipe
+],
+...
+----
+
+* use:
+[source]
+----
+{{ mystring | shorten:10 }}
+----
+
+* Pipes are not re-run automatically if data changes! Enforcing re-running pipe when underlying / piped data changes by adding _pure: false_ to declaration. However, may lead to performing issues:
+
+[source]
+----
+ @Pipe({
+   name: 'shorten',
+   pure: false
+ })
+ export class ShortenPipe implements PipeTransform {
+ ...
+----
+
+
 == Acknowledgements
 
 A huge thank you to Maximilian Schwarzmüller, who created such a great Udemy workshop that was the base for this repository, and who agreed to the contents of this repo.
