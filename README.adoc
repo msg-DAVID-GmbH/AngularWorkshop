@@ -1514,7 +1514,7 @@ onActivate() {
 [source]
 ----
 const myNumbers = Observable.interval(1000)
-  .pipe(.map(
+  .pipe(map(
     (data: number) => {
       return data * 2;
     }
@@ -2076,6 +2076,320 @@ declarations: [
  ...
 ----
 
+== Http Requests
+* new in Angular 6: _HttpClient_, see below. However, using _Http_ as shown here also valid.
+
+=== Sending Requests
+* add HttpModule in app.module.ts (at imports)!
+[source]
+----
+@Injectable()
+export class ServerService {
+  constructor(private http: Http) {}
+
+  storeServers(servers: any[]) {
+    return this.http.post('https://my-url', servers);
+  }
+}
+----
+* post-method will only create an observable and not immediately send the post-request. Hence: subscribe to it so request is send.
+* in some component on button-click:
+[source]
+----
+...
+onSave() {
+  this.serverService.storeServers(this.servers)
+    .subscribe(
+      (response) => console.log(response),
+      (error) => console.log(error)
+    );
+}
+...
+----
+* unsubscribing from subscription not necessary in this case because after request is done, Angular will do that automatically
+
+=== Getting Data back from Server
+[source]
+----
+@Injectable()
+export class ServerService {
+  constructor(private http: Http) {}
+
+  storeServers(servers: any[]) {
+    return this.http.post('https://my-url', servers);
+  }
+
+  getServers() {
+    return this.http.get('https://my-url');
+  }
+}
+----
+
+[source]
+----
+...
+onGet() {
+  this.serverService.getServers()
+    .subscribe(
+      (response: Response) => {
+        const data = response.json();
+        console.log(data);
+      },
+      (error) => console.log(error)
+    );
+}
+...
+----
+
+=== Using Observables
+* transformation of response into objects should be done in _ServerService_ because otherwise it would have to be copied in every component that causes the server call
+* _map()_ will wrap data automatically in observable:
+[source]
+----
+@Injectable()
+export class ServerService {
+  constructor(private http: Http) {}
+
+  storeServers(servers: any[]) {
+    return this.http.put('https://my-url', servers);
+  }
+
+  getServers() {
+    return this.http.get('https://my-url')
+      .pipe(.map(
+        (response: Response) => {
+          const data = response.json();
+          return data;
+        }
+      ));
+  }
+}
+----
+[source]
+----
+...
+onGet() {
+  this.serverService.getServers()
+    .subscribe(
+      (servers: any[]) => {
+        console.log(servers);
+      },
+      (error) => console.log(error)
+    );
+}
+...
+----
+
+=== Catching errors
+
+[source]
+----
+@Injectable()
+export class ServerService {
+  constructor(private http: Http) {}
+
+  storeServers(servers: any[]) {
+    return this.http.put('https://my-url', servers);
+  }
+
+  getServers() {
+    return this.http.get('https://my-url')
+      .pipe(.map(
+        (response: Response) => {
+          const data = response.json();
+          return data;
+        }
+      ))
+      .pipe(catchError(
+        (error: Response) => {
+
+          console.log(error);
+
+          // catch-operator will NOT create an observable
+          // automatically like the map-operator does, so
+          // it has to be create manually:
+          return Observable.throw(error);
+        }
+      ));
+  }
+}
+----
+
+=== Angular 6: HttpClient
+* new in Angular 6: _HttpClient_. Using _Http_ as shown above also valid; however _HttpClient_ brings new functionality
+* to use _HttpClient_, add HttpClientModule in app.module.ts (at imports) from _@angular/common/http_
+* same example as above, but with _HttpClient_:
+
+[source]
+----
+@Injectable()
+export class ServerService {
+  constructor(private httpClient: HttpClient) {}
+
+  storeServers(servers: any[]) {
+    // for put-methods, httpClient syntax equals http syntax:
+    return this.httpClient.put('https://my-url', servers);
+  }
+
+  getServers() {
+    // for get-methods, explicit typing of response possible because get() unwraps the body data:
+    return this.httpClient.get<Server[]>('https://my-url')
+      .pipe(map(
+        (servers) => {
+          return data;
+        }
+      ));
+  }
+  }
+}
+----
+
+==== Additional Options
+* options for _put_ (as 3rd parameter) and _get_ (as 2nd parameter): for example (as shown below) getting the whole response as text, instead of as JSON:
+[source]
+----
+this.httpClient.get('https://my-url', {
+  observe: 'response',
+  responseType: 'text'
+})
+.pipe(map( ... ));
+----
+
+* another example for further options: requesting events:
+
+[source]
+----
+@Injectable()
+export class ServerService {
+  constructor(private httpClient: HttpClient) {}
+
+  storeServers(servers: any[]) {
+    return this.httpClient.put('https://my-url', servers, {
+      observe: 'events'
+    });
+  }
+}
+
+... in component:
+
+...
+onGet() {
+  this.serverService.getServers()
+    .subscribe(
+      (response: HttpEvent<Object>) => {
+        // with "observe: 'events', response will have additional
+        // information regarding the event type. These can be used
+        // to filter for certain events:
+        console.log(response.type === HttpEventType.Sent); // "true" for "sent"-Events, false for rest
+      }
+    );
+}
+...
+----
+
+==== Setting Query Params
+* OK to set it like this:
+[source]
+----
+storeServers(servers: any[]) {
+  return this.httpClient.put('https://my-url?x=' + x , servers);
+}
+----
+* better way:
+[source]
+----
+storeServers(servers: any[]) {
+  return this.httpClient.put('https://my-url', servers, {
+    params: new HttpParams().set('x', x)
+  });
+}
+----
+
+==== Progress
+[source]
+----
+storeStuff() {
+
+  // creating a new request with "new HttpRequest()" basically the
+  // same as using "httpClient.put()", which creates pre-configrued
+  // request objects.
+  const req = new HttpRequest('PUT', 'https://my-url', this.myData, {reportProgress: true});
+  return this.httpClient.request(req);
+}
+----
+* will result in receiving several objects of _type: 1_ (upload progress) and _type: 3_ (download progress), which give information about the progress (_loaded: 500, total: 500_)
+
+==== Interceptors
+* use-case: sending multiple requests with same attribute, for example authorization token - automatic setting of this token would be nice
+* solution: sending requests without token and manipulate every outgoing request in another place
+* new file: _auth.interceptor.ts_ in _shared_:
+
+[source]
+----
+export class AuthInterceptor implements HttpInterceptor {
+
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
+    // simply forward the current request to be handled without any changes:
+    return next.handle(req);
+
+  }
+}
+----
+
+* interceptor only used when it is provided, for example in _app.module.ts_. However, special syntax!
+[source]
+----
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from '../shared/auth.interceptor';
+...
+providers: [
+  ...
+  {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+  ...
+...
+----
+* to register multiple interceptors, duplicate line _{provide: ..._
+
+* modifying requests, for example send an auth token with every request:
+[source]
+----
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  constructor(private authService: AuthService) {}
+
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
+    // requests are immutable, hence changes have to be made via a clone()-method
+    // that provides possibility for changing the object:
+    const copiedReq = req.clone({params: req.params.set('auth', this.authService.getToken())});
+
+    return next.handle(copiedReq);
+
+  }
+}
+----
+
+* also possible to intercept incoming responses (don't forget to register this interceptor, see above):
+[source]
+----
+export class LoggingInterceptor implements HttpInterceptor {
+
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
+    // handle-method returns an Observable which can be used to track every request.
+    // However, "subscribe()" would consume the request so it would not get passed on.
+    // Solution: "do"-method (which got renamed in Angular 6 from "do" to "tap"):
+    return next.handle(req).pipe(tap(
+      event => {
+        console.log('Logging', event);
+      }
+    ));
+  }
+}
+----
+
+* if multiple interceptors are registered, the order in which they are registered decides the order of execution
 
 == Acknowledgements
 
