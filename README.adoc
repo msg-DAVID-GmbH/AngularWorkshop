@@ -2391,6 +2391,19 @@ export class LoggingInterceptor implements HttpInterceptor {
 
 * if multiple interceptors are registered, the order in which they are registered decides the order of execution
 
+== Deploying Angular Applications
+=== Building
+* "good" deployment includes build and minify code which is done by
+
+    ng build --prod --aot
+
+* _aot_ = ahead of time compiler
+* creates _dist_-folder which has to be deployed
+
+=== Server Setup
+* set correct _<base>_-element, for example _<base href="/my-app/">_
+* server should always return _index.html_ because routing is managed by Angular
+
 == Acknowledgements
 
 A huge thank you to Maximilian Schwarzmüller, who created such a great Udemy workshop that was the base for this repository, and who agreed to the contents of this repo.
