@@ -2391,6 +2391,164 @@ export class LoggingInterceptor implements HttpInterceptor {
 
 * if multiple interceptors are registered, the order in which they are registered decides the order of execution
 
+== Unit Tests
+[source]
+----
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from '../app.component';
+
+describe('MyApp', () => {
+  beforeEach(() => {
+
+    // Configures the application like a normal Angular App,
+    // for example declaring which module should be in the
+    // testing environment.
+    // However, no imports or providers because it's not a
+    // real application that gets started here.
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ]
+    });
+  });
+
+
+  it('should create the app', async() => {
+
+    // Component has to be created in each it-block because
+    // each is contained in itself.
+    let fixture = TestBed.createComponent(AppComponent);
+
+    let app = fixture.debugElement.componentInstance;
+
+    // "Truthy" = "exists"
+    expect(app).toBeTruthy();
+  }));
+
+
+  it('should have as title 'app workds!'', async() => {
+
+    let fixture = TestBed.createComponent(AppComponent);
+
+    let app = fixture.debugElement.componentInstance;
+
+    expect(app.title).toEqual('app workds!');
+  }));
+
+
+  it('should render title in a H1 tag', async() => {
+
+    let fixture = TestBed.createComponent(AppComponent);
+
+    // necessary to have the template rendered
+    fixture.detectChanges();
+
+    let compiled = fixture.debugElement.nativeElement;
+
+    expect(compiled.querySelector('h1').textContent).toContain('app workds!');
+  }));
+
+});
+----
+
+* running tests via
+
+  ng test
+
+=== Testing Services
+* services tested in tests for components that use these services:
+
+[source]
+----
+it('should use the user name from the service'), () => {
+
+  let fixture = TestBed.createComponent(UserComponent);
+  let app = fixture.debugElement.componentInstance;
+  let userService = fixture.debugElement.injector.get(UserService);
+
+  // important to have injected service updated
+  fixture.detectChanges();
+
+  expect(userService.user.name).toEqual(app.user.name);
+});
+----
+
+==== Testing asynchronous tasks
+* Best Practice: Angular unit tests should not reach out to a server, instead there should be mocked data to be used in tests
+* example:
+
+[source]
+----
+export class DataService {
+  getDetails() {
+    const resultPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('Data');
+      }, 1000);
+    });
+  }
+}
+----
+
+* this _DataService_ is used in a component and tested there:
+[source]
+----
+// This is not a "real" test that should be written in a real application because
+// it only tests the Angular setup. It's kind of a pairing test for the second test,
+// see below.
+it('shouldn\'t fetch data successfully if not called asynchronously', () => {
+
+  let fixture = TestBed.createComponent(UserComponent);
+  let app = fixture.debugElement.componentInstance;
+
+  // DataService instance is getted and mocked to not actually call getDetails():
+  let dataService = fixture.debugElement.injector.get(DataService);
+  let spy = spyOn(dataService, 'getDetails')
+    .and.returnValue(Promise.resolve('Data'));
+  fixture.detectChanges();
+
+  expect(app.data).toBe(undefined);
+});
+
+// This test fakes an environment that allows for asynchronous tests
+it('shouldn fetch data successfully if not called asynchronously', async(() => {
+
+  let fixture = TestBed.createComponent(UserComponent);
+  let app = fixture.debugElement.componentInstance;
+
+  // DataService instance is getted and mocked to not actually call getDetails():
+  let dataService = fixture.debugElement.injector.get(DataService);
+  let spy = spyOn(dataService, 'getDetails')
+    .and.returnValue(Promise.resolve('Data'));
+  fixture.detectChanges();
+
+  // only when all asynchronous tasks are finished
+  fixture.whenStable().then(() => {
+    expect(app.data).toBe('Data');
+  });
+}));
+
+// This is an alternative kind of writing the test above
+it('shouldn fetch data successfully if not called asynchronously', fakeAsync(() => {
+
+  let fixture = TestBed.createComponent(UserComponent);
+  let app = fixture.debugElement.componentInstance;
+
+  // DataService instance is getted and mocked to not actually call getDetails():
+  let dataService = fixture.debugElement.injector.get(DataService);
+  let spy = spyOn(dataService, 'getDetails')
+    .and.returnValue(Promise.resolve('Data'));
+  fixture.detectChanges();
+
+  // With fakeAsync, the whenStable()-method is unnecessary, however now the tick()-method
+  // has to be here. It has the same meaning.
+  tick();
+  expect(app.data).toBe('Data');
+}));
+----
+
+* both approaches, async and fakeAsync, take the same time to execute
+
 == Deploying Angular Applications
 === Building
 * "good" deployment includes build and minify code which is done by
