@@ -176,6 +176,8 @@ image::referenceSearchInIDEA.png[]
 
 * also, https://www.jetbrains.com/webstorm/[WebStorm] is a lightweight IntelliJ IDEA and is suited for web development right away. However, IntelliJ IDEA https://stackoverflow.com/questions/13827214/can-intellij-idea-encapsulate-all-of-the-functionality-of-webstorm-and-phpstorm/13829907#13829907[can be upgraded via plugins to offer nearly the same functionality.]
 
+* To avoid warnings, https://stackoverflow.com/questions/39779272/webstorm-phpstorm-double-quotes-in-typescript-auto-import[the behavior of adding quotation marks should be adjusted] from double quotation marks to single quotation marks. Otherwise, IDEA will add double quotation marks in import-statements which will cause a lot of errors that have to be corrected manually.
+
 === Emmet
 * https://emmet.io
 * = Plugin for working with HTML and CSS
@@ -1951,6 +1953,9 @@ this.signupForn.statusChanges.subscribe(
 ----
 
 == Best Practices
+=== Style Guide
+https://mgechev.github.io/angularjs-style-guide/[Great Style Guide on Github for a lot of topics]
+
 === Returning "Defensive Copies" of Data
 * Returning an array from a method this way will return a reference to this array which could be used to alter the array:
 
@@ -2390,6 +2395,118 @@ export class LoggingInterceptor implements HttpInterceptor {
 ----
 
 * if multiple interceptors are registered, the order in which they are registered decides the order of execution
+
+== Modules
+* until now, only one module: App Module
+* Feature modules: set of components and directives that define a feature should be outsourced in their own module
+
+=== Creating new Modules
+1. new file: myname.module.ts
+1. decorate with @NgModule()
+1. add _CommonModule_ as import (contains common directives)
+1. _BrowserModule_ contains all features of _CommonModule_ and some additional features that are needed at app startup - hence, _BrowserModule_ should be added to _app.module.ts_, but not _CommonModule_
+1. add custom declarations, imports, providers and the main module (bootstrap) - syntax see _app.module.ts_
+1. add new module to _import_ in _app.module.ts_
+1. create new routing declaration: _myname-routing.module.ts_ because every module manages its own routing - however, it has to be _RouterModule.forChild()_ because _forRoot_ is only valid for the root-router which is _app-routing.module.ts_. Don't forget to add this routing module to the newly created module (in _imports_).
+[source]
+----
+@NgModule({
+  imports: [RouterModule.forChild(appRoutes)],
+  exports: [RouterModule]
+})
+export class MynameRoutingModule {
+
+----
+
+Limitation: Components, Pipes and Directives must not be declared in more than one module
+
+=== Shared Modules
+* Directives that should be used in multiple modules should be in a _SharedModule_
+* typically, only one _SharedModule_ that contains everything that gets shared
+* in _shared_-folder, create new _shared.module.ts_
+* add every directive that should be shared in _declarations_ *and* _exports_:
+
+[source]
+----
+@NgModule({
+  declarations: [
+    MyCoolDirective
+  ],
+  exports: [
+    MyCoolDirective
+  ]
+})
+export class SharedModule {}
+----
+
+* every component has to be declared exactly once in an Angular app
+* component only usable and visible in module where it is declared
+* to make component visible to other modules: add it to _exports_
+* hence: shared components should be declared in _SharedModule_ and only there
+* _shared_-module can be imported into other modules and exported component can be used there
+* attention: components from the _SharedModule_ must not be *declared* in other modules (i.e. added to _declarations_), but *imported* (i.e. added to _imports_) (because components must be declared exactly once)
+* attention: *never* provide services in shared modules because that's bad style and results in problems with lazy loading
+
+=== Lazy Loading
+* user may not visit all modules
+* however, everything under _imports_ in _AppModule_ will be downloaded when visiting app
+* solution: load only necessary / probable modules, lazy-load the rest when needed
+* lazy-loading defined in routing-file:
+
+[source]
+----
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(appRoutes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {
+}
+----
+
+* beware that _loadChildren_ uses a string whereas other definitions in the routing-file take a type, which automatically creates a dependency to these modules - a simple string doesn't do that
+* string consists of path and class name, separated by _#_
+* beware: routing of lazy-loaded component has to be changed so that it doesn't have an own root:
+[source]
+----
+const lazyRoutes: Routes = [
+  { path: '', component: LazyComponent }
+  ...
+----
+
+=== Injection of Services
+* If a service is referenced in the _providers_-array of a lazy-loaded module, Angular will create a *new instance* of this service as soon as the module is loaded because the creation of the other services (referenced in _providers_-array of the eagerly loaded modules) are finished being created.
+* If the service is *only* provided in the eagerly loaded modules and not additionally in the lazy-loaded module, all services will use the same instance of this service.
+
+=== Core Module
+* = module that can be created to make _AppModule_ leaner by collecting everything that is only used in the _AppModule_
+* possible contents:
+** header
+** HomeComponent
+
+=== Ahead-of-Time Compilation
+* compiling = parsing of HTML-template files and compiling to Java Script
+* 2 modes:
+** Just-in-Time = develop code, load it into production, download into browser, then compile
+** Ahead-of-Time = after development, immediately compile, load it into production and download into browser
+* with AOT:
+** faster startup because parsing and compilation doesn't happen in browser
+** templates checked during development (errors that are only visible in browser)
+** smaller filesize because compiler (+unneeded features) doesn't need to be shipped
+
+* enabling AOT:
+
+    ng build --prod
+
+* = short form of
+
+    ng build --prod --aot
+
+* main disadvantage: length of build + shipped code minified and not debuggable
 
 == Unit Tests
 [source]
