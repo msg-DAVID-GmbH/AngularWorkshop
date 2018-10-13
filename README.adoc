@@ -2416,6 +2416,7 @@ export class LoggingInterceptor implements HttpInterceptor {
 * debugger available at https://jwt.io[jwt.io]
 * token = single authentification factor, hence should not be kept long time
 * token visible in browser dev tools -> Application -> Storage -> Local Storage -> http://localhost:4200
+* *detailed information https://github.com/stevenschwenke/springsecurityworkshop[in this Github repo]*
 
 == Modules
 * until now, only one module: App Module
