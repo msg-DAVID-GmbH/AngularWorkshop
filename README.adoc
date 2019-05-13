@@ -189,66 +189,6 @@ image::referenceSearchInIDEA.png[]
 
 image::emmetAbbreviationPreview.png[]
 
-== TypeScript
-* Angular uses TypeScript: files ending with "ts"
-* superset of Java Script, which is a new statically, strongly-typed programming language on top of Java Script
-* doesn't run in the browser, has to be compiled - that's what the CLI is for!
-* type can either be stated explicitly:
-
-    serverId:number = 10;
-
-* type can also be omitted and chosen automatically:
-
-    serverId = 10;
-
-* with Ctrl + B, variables reveal their types:
-
-image::typeCheckingWithCtrlB.png[]
-
-=== Automatic Creation of Properties
-* instead of writing this:
-
-[source]
-----
-export class Ingredient {
-    public name: string;
-    public amount: number;
-
-    constructor(name: string, amount: number) {
-      this.name = name;
-      this.amount = amount;
-    }
-  }
-----
-
-* ... this can be written with the same result:
-[source]
-----
-export class Ingredient {
-
-  constructor(public name: string, public amount: number) {
-  }
-}
-----
-* properties will be automatically created and assigned with the parameters of the constructor
-
-=== Variable Declaration: var, let, const
-* three options for declaring variable: var, let, const
-
-==== var
-* spoiler alert: least preferable from the three options
-* traditional the way to declare a variable in JavaScript
-* available in TypeScript because TypeScript = superset of JavaScript
-* some odd "features" like "var-scoping": declarations of var are accessible anywhere, even globally. Details see https://www.typescriptlang.org/docs/handbook/variable-declarations.html[here]
-
-==== let
-* introduced because of the problems with var
-* block-scoped = not visible outside of the block let was defined in
-* behavior = expected behavior when coming from Java
-
-==== const
-* = augmentation of let; prevents re-assignment
-* principle of least privilege: const should be used whenever re-assignment of variable is not intended
 
 == Debugging
 === Developer Tools
