@@ -70,8 +70,9 @@ These are notes and code snippets from the Udemy Workshop https://www.udemy.com/
 * should be kept running all the time because changes in files are automatically saved, compiled and the app refreshed in the browser (without the need to hit F5!)
 
 == Setup Option 2: JHipster = Angular with Spring Boot Backend and Deployment in Pivotal Cloud Foundry
-* this option: complete and deployable application with Angular UI
-* http://www.jhipster.tech[JHipster] = Spring Boot + Angular Generator
+* this option: generate complete and deployable application with Angular UI
+* generated with help of http://yeoman.io[Yeoman], which is a scaffolding tool that can generate different projects using best practices, for example Angular or Node.js
+* http://www.jhipster.tech[JHipster] = Yeoman-Generator that creates a Spring Boot + Angular Project
 
 === Install Yarn
 * https://yarnpkg.com/lang/en/docs/install/#windows[Yarn] = Dependency Manager
@@ -188,66 +189,6 @@ image::referenceSearchInIDEA.png[]
 
 image::emmetAbbreviationPreview.png[]
 
-== TypeScript
-* Angular uses TypeScript: files ending with "ts"
-* superset of Java Script, which is a new statically, strongly-typed programming language on top of Java Script
-* doesn't run in the browser, has to be compiled - that's what the CLI is for!
-* type can either be stated explicitly:
-
-    serverId:number = 10;
-
-* type can also be omitted and chosen automatically:
-
-    serverId = 10;
-
-* with Ctrl + B, variables reveal their types:
-
-image::typeCheckingWithCtrlB.png[]
-
-=== Automatic Creation of Properties
-* instead of writing this:
-
-[source]
-----
-export class Ingredient {
-    public name: string;
-    public amount: number;
-
-    constructor(name: string, amount: number) {
-      this.name = name;
-      this.amount = amount;
-    }
-  }
-----
-
-* ... this can be written with the same result:
-[source]
-----
-export class Ingredient {
-
-  constructor(public name: string, public amount: number) {
-  }
-}
-----
-* properties will be automatically created and assigned with the parameters of the constructor
-
-=== Variable Declaration: var, let, const
-* three options for declaring variable: var, let, const
-
-==== var
-* spoiler alert: least preferable from the three options
-* traditional the way to declare a variable in JavaScript
-* available in TypeScript because TypeScript = superset of JavaScript
-* some odd "features" like "var-scoping": declarations of var are accessible anywhere, even globally. Details see https://www.typescriptlang.org/docs/handbook/variable-declarations.html[here]
-
-==== let
-* introduced because of the problems with var
-* block-scoped = not visible outside of the block let was defined in
-* behavior = expected behavior when coming from Java
-
-==== const
-* = augmentation of let; prevents re-assignment
-* principle of least privilege: const should be used whenever re-assignment of variable is not intended
 
 == Debugging
 === Developer Tools
@@ -914,6 +855,17 @@ export class MyDataService {
 ----
 * _@Injectable()_ should only be added if services are injected
 
+=== ProvidedIn
+* since Angular 6: _ProvidedIn_ to automatically register services and guards:
+
+    @Injectable({
+      providedIn: 'root'
+    })
+
+* no need to add manually as a provider in _app.module.ts_
+* recommendation of Angular team: use with new features, but no need to replace all old code
+* not possible with Interceptors because of multi-binding-syntax
+
 == Routing
 * allows to change URL, so it seems to be a multi-site-application, however it's still a single-page-application
 * example: localhost:4200/users loading _UsersComponent_
@@ -1273,7 +1225,9 @@ const appRoutes: Routes = [
 * to guard child-modules:
 ** implement interface _CanActivateChild_
 ** use _canActivateChild_ in _const appRoutes_ in _app-routing.module.ts_
-* other guard: _canDeactivate_ to react on leaving a route
+* other guard: _canDeactivate_ to react on leaving a route (for example to enforce saving)
+** _canDeactivate_ is typed with the component that should be left, for example to check for unsaved content (other guards not typed because component doesn't exist yet)
+* if route is guarded by multiple guards: if just one guard has veto, access not granted
 
 === Passing static Data to a Route
 [source]
@@ -2325,8 +2279,12 @@ storeStuff() {
 * will result in receiving several objects of _type: 1_ (upload progress) and _type: 3_ (download progress), which give information about the progress (_loaded: 500, total: 500_)
 
 ==== Interceptors
-* use-case: sending multiple requests with same attribute, for example authorization token - automatic setting of this token would be nice
-* solution: sending requests without token and manipulate every outgoing request in another place
+* use-cases:
+** including headers, e.g. for authentification
+** central error handling
+** caching
+** sending multiple requests with same attribute, for example authorization token - automatic setting of this token would be nice
+* solution for last use case: sending requests without token and manipulate every outgoing request in another place
 * new file: _auth.interceptor.ts_ in _shared_:
 
 [source]
@@ -2342,6 +2300,7 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 ----
 
+* naming: "next" because interceptors can be chained, hence "next" as the next element in the chain
 * interceptor only used when it is provided, for example in _app.module.ts_. However, special syntax!
 [source]
 ----
@@ -2395,6 +2354,28 @@ export class LoggingInterceptor implements HttpInterceptor {
 ----
 
 * if multiple interceptors are registered, the order in which they are registered decides the order of execution
+
+== Authentification
+* with server-side rendering technologies, server stores session and client only gets session cookie
+* in single page applications however:
+** not that many requests to the backend because a lot of logic is handled by Angular
+** no session stored in server, server stateless.
+** but, to not have authentification at every single request: auth-token generated by server and send from server to client which is used for further requests
+* token used by Angular: JSON Web Tokens = https://jwt.io[JWO]
+* hence, Angular client has to store token it got from server to use it for every request
+
+=== JWT
+* https://jwt.io/introduction/[introduction]
+* "securely transmitting information between parties as a JSON object"
+* "trusted because digitally signed"
+* authorization = most common scenario for JWT
+* single sign-on often uses JWT
+* another use-case: secure information exchange
+* dot-separated structure of a JWT: _header.payload.signature_
+* debugger available at https://jwt.io[jwt.io]
+* token = single authentification factor, hence should not be kept long time
+* token visible in browser dev tools -> Application -> Storage -> Local Storage -> http://localhost:4200
+* *detailed information https://github.com/stevenschwenke/springsecurityworkshop[in this Github repo]*
 
 == Modules
 * until now, only one module: App Module
@@ -2492,11 +2473,12 @@ const lazyRoutes: Routes = [
 * compiling = parsing of HTML-template files and compiling to Java Script
 * 2 modes:
 ** Just-in-Time = develop code, load it into production, download into browser, then compile
-** Ahead-of-Time = after development, immediately compile, load it into production and download into browser
+** Ahead-of-Time = immediately compile to Java Script, load into browser
 * with AOT:
 ** faster startup because parsing and compilation doesn't happen in browser
-** templates checked during development (errors that are only visible in browser)
-** smaller filesize because compiler (+unneeded features) doesn't need to be shipped
+** templates checked during development (errors that are only visible in browser), hence errors immediately visible in terminal (instead of later in browser)
+** smaller file size because compiler (+unneeded features) doesn't need to be shipped
+** "Tree Shaking" = not-needed libraries removed to make smaller download
 
 * enabling AOT:
 
@@ -2506,7 +2488,12 @@ const lazyRoutes: Routes = [
 
     ng build --prod --aot
 
-* main disadvantage: length of build + shipped code minified and not debuggable
+* however, introduced with Angular 6:
+
+    ng serve --aot
+
+* this will enable AOT - however this option not pushed and marketed by Angular team, maybe changed in future
+* with ATO: startup time cut roughly in half (linear behavior; valid for all applications)
 
 == Unit Tests
 [source]
@@ -2682,3 +2669,203 @@ it('shouldn fetch data successfully if not called asynchronously', fakeAsync(() 
 == Acknowledgements
 
 A huge thank you to Maximilian Schwarzmüller, who created such a great Udemy workshop that was the base for this repository, and who agreed to the contents of this repo.
+
+== Structuring Angular Applications
+- best practice: one module per feature, each with 7 +- 1 components
+- in bigger applications, just having folders for features not sufficient
+- solutions:
+1. npm-Packages
+1. Monorepo
+1. Microservice
+1. Majestic Monolith
+
+=== npm Packages
+- goal: cutting project down into small libraries that can easily be used and replaced
+- npm-package consists of
+1. /node_modules
+1. business packages (that do the actual work)
+1. package.json with metadata
+
+==== Generating npm Packages with ng-packagr
+- https://goo.gl/hjt7G3[Angular Package Format] (detailed specification)
+- building packages according to this specification cumbersome
+- https://github.com/dherges/ng-packagr[ng-packagr] automates most of this process
+- with Angular 6: ng-packagr part of CLI
+- creating sub projects:
+
+    ng generate library logger-lib
+
+- creating applications (within an existing Angular application):
+
+    ng generate application playground-app
+
+- (Libs are imported, applications are executed)
+- best practice for libs: create demo-application that shows how to use lib
+
+==== Folder Structure
+- folder structure for project with subprojects:
+
+    project
+    |-- node_modules
+    |-- projects
+    |   |-- logger-lib
+    |   |-- playground-app
+    |   |-- playground-app-e2e
+    |-- src ==> DELETE!
+    |-- angular.json
+    |-- package-lock.json
+    |-- package.json
+
+- when using subprojects, delete _src_-folder
+- "Either one main project or subprojects"
+
+==== Defining Interface of Library
+- in logger-lib: _public_api.ts_ defines interface for using the lib:
+
+    export * from '.lib/bla';
+
+- = "Barrel" = place
+
+- used with
+
+    import { LoggerService } from '@my/logger-lib'
+    ...
+    constructor(private logger: LoggerService) {
+
+- Import readable because of this (in _tsconfig.json_):
+
+    "paths": {
+      "@my/logger-lib": [
+        // "projects/logger-lib/src/public_api"
+        "dist/projects/logger-lib/src/public_api"
+      ]
+      }
+
+- commented line used during development, uncommented line for delivery
+- = mapped Namespace
+
+==== Deployment
+* _npm publish_ publishes the code in internet, _npm publish --registry http://..._ only internally (depending on given URL)
+* best practice: in project root _.npmrc_ so that _publish_-command doesn't have to get the parameter (which can be forgotten easily)
+* npm registries:
+** Nexus
+** Artifactory
+** Team Foundation Server
+** Verdaccio (very small)
+
+=== Monorepos
+* "Monorepo" = multiple projects in one Git-Repo
+* = slice application in sub-projects so that application only consists of those sub-projects
+* similar to lib + playground-app, but different on organizational layer because sub-projects not just libs and playground-apps, but "real", full-grown applications
+* _node_modules_ only 1x and set for all sub-projects
+* hence: all sub-projects same Angular-version
+* Monorepo good approach if huge application only sliced in smaller chunks without the need to be deployed separately
+* potential problems: all applications have to use same Angular-version, hence have to be updated all at once
+* in sub-projekts no _package.json_, just one in main root for all sub-projects
+* "basically a renamed _src_-folder"
+* approach not new, just new name
+* switch between Monorepo and example with lib + playground-app in _tsconfig.json_ with Mapping of the submodules
+* no best practice for structure of subfolders of sub-projects
+* "barrel" (see above) in ever sub-project for information hiding (_public_api.ts_)
+
+==== Folder-Structure
+    project
+    |-- node_modules
+    |-- projects
+    |   |-- admin-app
+    |   |-- customer1-app
+    |   |-- customer2-app
+    |-- angular.json
+    |-- package-lock.json
+    |-- package.json
+
+==== Nx
+* https://nrwl.io
+* extension for CLI
+* toolkit to build enterprise-grade Angular applications
+* graphical output for dependencies between modules
+* definition of rulesets for access between modules possible
+
+=== Microservice
+* problem with monorepo: architectural decisions have to be followed by all sub-projects
+* Microservice-approach = separation of different applications, maximal independence
+* however, in frontend: all Micro-Apps have to be composed into one application
+* in frontend: "Micro-App" or "Micro-Frontend"
+
+==== Hyperlink
+* simplest solution
+* Disadvantages:
+** loss of state between applications, hence only good if little shared state / communication
+* use when
+** product-suite like Google (Search, Maps, ...), when different applications don't need to know much about each other
+
+==== iFrame
+* ugly solution because different problems like scaling
+
+==== WebComponents
+- = browser-standard, framework-agnostic
+- dynamic loading possible
+- Shadow-DOM: CSS of different apps don't cause problems
+- since Angular 6 full support of WebComponents
+- supports different technology of applications
+- implementation with https://angular.io/guide/elements[Angular Elements] (since Angular 6)
+
+=== Majestic Monolith
+* basically a "good monolith" consisting of libs and Monorepo
+
+== Cross-Cutting Concerns
+=== Authorization
+* with HTTP Interceptors, see sample above at HTTP Interceptors
+* best practice: don't send auth token with every request, filter with _if(req.url.startsWith(...))_
+
+=== Login & Access Control
+* OAuth 2 = most-used protocol
+* OpenIDConnect = additional standard to OAuth 2, so that client gets a second token: Identity-Token. That is readable to the client (in contrast to the Access-Token, which is supposed to be only for the resource-server and not readable for the client). Identity-token can be used in the client, for example to grant access to menu-items or show meta data.
+* https://github.com/manfredsteyer/angular-oauth2-oidc[angular-oauth2-oidc]
+** = lib to use OAuth 2
+** supports ActiveDirectory so login within the domain seemless
+* Redhat Keycloak for Java = Auth-Server for Java-Backend
+* Best Practice: Only get authentification from Auth-Server. Auth-server shouldn't know business-logic. Only get token and with that token go to business logic server and decide what the token means in respect to rights and privileges.
+* Best Practice: one token per Security-Domain
+* Best Practice: Token only valid for 10 to 20 minutes, not multiple days
+* using Active Directory over well-defined web protocols: https://www.conet.de/blog/technologien/microsoft/2013-06-25/was-sind-microsoft-active-directory-federation-services-adfs-102[Active Directory Federation Services]
+
+=== Performance
+* mit Angular CLI out of the box: bundling + minification + _enableProdMode()_
+
+==== Preloading
+* preloading = load contents asynchronously that are not needed yet, but maybe in the future
+* chunks to load should be per-feature so that when loading, whole features are loaded
+* best practice: use lazy loading and preloading from the beginning instead of adding it later
+
+=== Caching with Service Worker
+* service worker = installed from web app into browser, running there even without app
+* for example implementation of caches: leaving data in browser has same effect as using HTTP Interceptors, however on a totally different layer
+* best practice: use abstractions to work with service workers (like workbox or @angular/service-worker) instead of programming service workers directly
+* Service Worker in tab "Application" in dev-mode in browser visible
+* main usage: working app even during offline phases - however only for temporary
+
+=== Server Side Rendering
+* pre-render first view to show before Java Script has been loaded
+* perceived performance enhanced (it's not really faster)
+* in Angular: _renderModuleFactory_
+* a lot of work for small improvement - only for really huge and publicly available applications
+* Support of plain Angular: only _renderModuleFactory_, however some community-projects
+* https://universal.angular.io
+
+=== I18N
+* 2 solutions:
+1. (official solution) Angular Compiler
+1. ("the working option") ngx-translate
+
+==== Angular Compile
+* extract texts from templates to xml-files
+* after translating xml-files: compile them back into templates
+* very good performance because translated texts merged into templates
+* however, one build per language + restart of app to change language
+
+==== ngx-translate
+* http://www.ngx-translate.com
+* server-calls via JSON to get translation data from server + set in template via data-binding
+* performance overhead during runtime, but all disadvantages from angular compile solved
+* Defacto Standard
